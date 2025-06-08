@@ -1,0 +1,15 @@
+name: Release and Version
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: softprops/action-gh-release@v1
+        with:
+          files: clock_pv_forecast_card.js
