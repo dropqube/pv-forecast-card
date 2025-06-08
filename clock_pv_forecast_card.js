@@ -1,4 +1,4 @@
-// clock-pv-forecast-card Version 0.016 – weekday column adapts to format
+// clock-pv-forecast-card int. Version# 0.020 – now with configurable max bar reference value
 import { LitElement, html, css } from 'https://unpkg.com/lit@2.8.0/index.js?module';
 
 console.info("📦 clock-pv-forecast-card loaded");
@@ -31,8 +31,15 @@ class ClockPvForecastCard extends LitElement {
       animation_duration: config.animation_duration || '1s',
       bar_color_start: config.bar_color_start || '#3498db',
       bar_color_end: config.bar_color_end || '#2ecc71',
+      remaining_color_start: config.remaining_color_start || '#999999',
+      remaining_color_end: config.remaining_color_end || '#cccccc',
+      remaining_threshold: config.remaining_threshold ?? null,
+      remaining_low_color_start: config.remaining_low_color_start || '#e74c3c',
+      remaining_low_color_end: config.remaining_low_color_end || '#e67e22',
+      max_value: config.max_value ?? 100,
       weekday_format: format,
       day_column_width: weekdayWidth[format] || '2.5em',
+      entity_remaining: config.entity_remaining || null,
       ...config,
     };
   }
@@ -62,9 +69,27 @@ class ClockPvForecastCard extends LitElement {
                 <div class="value">${value.toFixed(1)} kWh</div>
               </div>`;
           })}
+
+          ${this.config.entity_remaining ? this._renderRemainingBar() : ''}
         </div>
       </ha-card>
     `;
+  }
+
+  _renderRemainingBar() {
+    const remaining = parseFloat(this.hass.states[this.config.entity_remaining]?.state ?? '0');
+    const belowThreshold = this.config.remaining_threshold !== null && remaining <= this.config.remaining_threshold;
+    const start = belowThreshold ? this.config.remaining_low_color_start : this.config.remaining_color_start;
+    const end = belowThreshold ? this.config.remaining_low_color_end : this.config.remaining_color_end;
+    const barStyle = `--bar-width: ${this._barWidth(remaining)}%; --bar-gradient: linear-gradient(to left, ${start}, ${end}); --animation-time: ${this.config.animation_duration}`;
+    return html`
+      <div class="forecast-row">
+        <div class="day" style="width: ${this.config.day_column_width}">Rest</div>
+        <div class="bar-container rtl">
+          <div class="bar" style="${barStyle}"></div>
+        </div>
+        <div class="value">${remaining.toFixed(1)} kWh</div>
+      </div>`;
   }
 
   _getWeekdayName(offset) {
@@ -75,7 +100,7 @@ class ClockPvForecastCard extends LitElement {
   }
 
   _barWidth(value) {
-    const max = 100;
+    const max = parseFloat(this.config.max_value || 100);
     return Math.min((value / max) * 100, 100);
   }
 
@@ -101,6 +126,9 @@ class ClockPvForecastCard extends LitElement {
       background: #eee;
       border-radius: 7px;
       overflow: hidden;
+    }
+    .bar-container.rtl {
+      direction: rtl;
     }
     .bar {
       height: 100%;
