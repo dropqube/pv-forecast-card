@@ -1,8 +1,7 @@
 {
   "name": "Clock PV Forecast Card",
   "filename": "clock_pv_forecast_card.js",
-  "content_in_root": true,
   "type": "plugin",
-  "description": "Display your daily solar PV forecast as animated bars with localized weekday labels in Home Assistant",
+  "content_in_root": true,
   "render_readme": true
 }
