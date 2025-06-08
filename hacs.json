@@ -1,0 +1,9 @@
+{
+  "name": "Clock PV Forecast Card",
+  "content_in_root": true,
+  "filename": "clock_pv_forecast_card.js",
+  "render_readme": true,
+  "description": "Display your daily solar PV forecast as animated bars in Home Assistant - inspired by Clock Weather Card",
+  "type": "lovelace",
+  "authors": ["dropqube"]
+}
