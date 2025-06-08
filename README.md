@@ -94,7 +94,8 @@ Heavily inspired by https://github.com/pkissling/clock-weather-card
 ---
 
 ### 🧩 Example Configuration
-#ADD AS MANUAL CARD AND ENTER THE CODE BELOW. REPLACE WITH YOUR OWN SENSORS
+ADD AS MANUAL CARD AND ENTER THE CODE BELOW. REPLACE WITH YOUR OWN SENSORS.
+If you want to use less bars just put a # before the respective entity_day so it won't get displayed 
 
 ```yaml
 type: custom:clock-pv-forecast-card
@@ -160,6 +161,7 @@ bar_color_start: '#ffaa00'
 bar_color_end: '#66cc00'
 weekday_format: short
 ```
+Wenn du weniger Balken haben möchstest, einfach die jeweilige entity_ mit # am Anfang auskommentieren oder den Eintrag weglassen
 
 ### 🔍 Parameterübersicht
 
