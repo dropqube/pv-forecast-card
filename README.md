@@ -131,7 +131,7 @@ The `weekday_format` automatically adjusts the label column width:
 ### 💡 Tip
 
 This card works great in `vertical-stack` or `grid` layouts. Use custom themes and color vars like `var(--primary-color)` to adapt the visuals to your dashboard.
-
+If you don't know hex color codes, just use the one provided by google: https://www.google.com/search?q=hex+color+picker
 ----------------------------------------
 GERMAN
 
@@ -171,6 +171,7 @@ weekday_format: short
 
 * Die Tagesnamen orientieren sich an der Home Assistant-Lokalisierung.
 * Die Spaltenbreite passt sich automatisch dem Format an.
+* Wenn dir HEX Codes nichts sagen, einfach das hier benutzen: https://www.google.com/search?q=hex+color+picker
 
 ### 🧪 Hinweise
 
