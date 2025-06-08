@@ -94,6 +94,7 @@ Heavily inspired by https://github.com/pkissling/clock-weather-card
 ---
 
 ### 🧩 Example Configuration
+#ADD AS MANUAL CARD AND ENTER THE CODE BELOW. REPLACE WITH YOUR OWN SENSORS
 
 ```yaml
 type: custom:clock-pv-forecast-card
@@ -145,6 +146,7 @@ Die Karte zeigt **PV-Erzeugungsprognosen** für die nächsten 5 Tage als **animi
 * Karte über Ressourcen registriert (z. B. via `resources:` oder HACS `Lovelace → Ressourcen`)
 
 ### 🧩 Beispielkonfiguration (YAML)
+# BITTE ALS KARTE EINE MANUELLE KARTE HINZUFÜGEN UND DEN CODE EINGEBEN
 
 ```yaml
 type: custom:clock-pv-forecast-card
