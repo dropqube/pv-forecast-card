@@ -4,6 +4,5 @@
   "content_in_root": true,
   "type": "plugin",
   "description": "Display your daily solar PV forecast as animated bars with localized weekday labels in Home Assistant",
-  "render_readme": true,
-  "authors": ["dropqube"]
+  "render_readme": true
 }
