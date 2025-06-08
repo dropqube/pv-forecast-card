@@ -102,7 +102,7 @@ entity_tomorrow: sensor.solcast_pv_forecast_prognose_morgen
 entity_day3: sensor.solcast_pv_forecast_prognose_tag_3
 entity_day4: sensor.solcast_pv_forecast_prognose_tag_4
 entity_day5: sensor.solcast_pv_forecast_prognose_tag_5
-animation_duration: 1.5s
+animation_duration: 1.5s # Set this to 0 if you don't want animated bars
 bar_color_start: '#ffaa00'
 bar_color_end: '#00cc66'
 weekday_format: long
@@ -153,7 +153,7 @@ entity_tomorrow: sensor.solcast_pv_forecast_prognose_morgen
 entity_day3: sensor.solcast_pv_forecast_prognose_tag_3
 entity_day4: sensor.solcast_pv_forecast_prognose_tag_4
 entity_day5: sensor.solcast_pv_forecast_prognose_tag_5
-animation_duration: 1.5s
+animation_duration: 1.5s #Auf 0 setzen wenn keine Animation erwünscht ist
 bar_color_start: '#ffaa00'
 bar_color_end: '#66cc00'
 weekday_format: short
