@@ -13,7 +13,7 @@ Heavily inspired by https://github.com/pkissling/clock-weather-card
 
 **Installation instructions are at the top for further information scroll down / Installationsanleitung steht oben, für mehr Infos weiter nach unten scrollen*
 
-### 🇬🇧 Installation of `clock-pv-forecast-card` in Home Assistant
+### 🇬🇧 MANUAL Installation of `clock-pv-forecast-card` in Home Assistant
 
 1. **Place the JavaScript file**
    Download or create the file `clock_pv_forecast_card.js` and save it to:
@@ -45,7 +45,7 @@ Heavily inspired by https://github.com/pkissling/clock-weather-card
 5. **Ensure your forecast entities exist**
    The required sensors must return forecasted kWh values (e.g. from Solcast or other PV integrations).
 ---
-### 🇩🇪 Installation der `clock-pv-forecast-card` in Home Assistant
+### 🇩🇪 Manuelle Installation der `clock-pv-forecast-card` in Home Assistant
 
 1. **Datei speichern**
    Lade die Datei `clock_pv_forecast_card.js` herunter oder erstelle sie selbst aus dem Code.
