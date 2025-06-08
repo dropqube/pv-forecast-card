@@ -1,13 +1,16 @@
 ## 🔆 clock-pv-forecast-card
 A compact and elegant **solar forecast card** for Home Assistant, displaying five days of PV yield predictions as **animated progress bars**, with **localized weekday labels** and customizable styling.
+
 A "Clock Weather Card" inspired solar forecast card for visualizing the forecast
 Eine Karte mit PV-Prognose für die nächsten Tage
+
 Heavily inspired by https://github.com/pkissling/clock-weather-card
 
 ![image](https://github.com/user-attachments/assets/0b4fa0bc-5e63-40c8-be15-165816b01de4)
 
 
-**For GERMAN readme scroll down / für deutsche Anleitung nach unten scrollen**
+**For GERMAN readme scroll down / für DEUTSCHE Anleitung nach unten scrollen**
+
 **Installation instructions are at the top for further information scroll down / Installationsanleitung steht oben, für mehr Infos weiter nach unten scrollen*
 
 ### 🇬🇧 Installation of `clock-pv-forecast-card` in Home Assistant
