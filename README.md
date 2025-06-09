@@ -105,6 +105,8 @@ Heavily inspired by [Clock Weather Card](https://github.com/pkissling/clock-weat
 
 ### 🧩 Example Configuration
 
+If you have no use for a day entity - just don't use the line :) you choose what you want to display! same goes for the "Rest" (remaining) bar
+
 ```yaml
 type: custom:clock-pv-forecast-card
 entity_remaining: sensor.solcast_pv_forecast_prognose_verbleibende_leistung_heute
@@ -113,6 +115,8 @@ entity_tomorrow: sensor.solcast_pv_forecast_prognose_morgen
 entity_day3: sensor.solcast_pv_forecast_prognose_tag_3
 entity_day4: sensor.solcast_pv_forecast_prognose_tag_4
 entity_day5: sensor.solcast_pv_forecast_prognose_tag_5
+entity_day6: sensor.solcast_pv_forecast_prognose_tag_6
+entity_day7: sensor.solcast_pv_forecast_prognose_tag_7
 animation_duration: 5s
 bar_color_start: "#ffcc00"
 bar_color_end: "#00cc66"
@@ -133,7 +137,7 @@ show_tooltips: true
 
 | Option                          | Type     | Description                                            |
 | ------------------------------- | -------- | ------------------------------------------------------ |
-| `entity_today` to `entity_day5` | `sensor` | Daily forecast in kWh                                  |
+| `entity_today` to `entity_day7` | `sensor` | Daily forecast in kWh / If you have less entities just don't use the respective day |
 | `entity_remaining`              | `sensor` | Optional: remaining value today (in kWh)               |
 | `animation_duration`            | `string` | CSS time (e.g. `0.5s`, `2s`)                           |
 | `bar_color_start` / `end`       | `string` | Gradient colors for main bars                          |
