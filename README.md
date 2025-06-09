@@ -1,10 +1,10 @@
 ## 🔆 clock-pv-forecast-card
-
+See release notes for new functionality!
 A compact and elegant **solar forecast card** for Home Assistant, displaying five days of PV yield predictions as **animated progress bars**, with **localized weekday labels** and customizable styling.
 
 Heavily inspired by [Clock Weather Card](https://github.com/pkissling/clock-weather-card)
 
-![image](https://github.com/user-attachments/assets/0b4fa0bc-5e63-40c8-be15-165816b01de4)
+![screengif_pvforecast](https://github.com/user-attachments/assets/54056e14-29ba-4e0b-95ca-0795044ea784)
 
 ---
 
@@ -87,7 +87,7 @@ Heavily inspired by [Clock Weather Card](https://github.com/pkissling/clock-weat
 
 ### 📦 Features
 
-- 5-day PV forecast using your preferred integration
+- 7-day PV forecast using your preferred integration - you can choose which days to display! (Today and tomorrow remain mandatory)
 - Animated bars with customizable colors
 - Responsive and localized layout
 - Optional remaining energy bar (with shrinking animation and alert color)
@@ -120,9 +120,11 @@ weekday_format: short
 remaining_color_start: "#e67e22"
 remaining_color_end: "#f1c40f"
 remaining_threshold: 5
+remaining_blink: true
 remaining_low_color_start: "#ff0000"
 remaining_low_color_end: "#ffa500"
 max_value: 120
+show_tooltips: true
 ```
 
 ---
@@ -133,7 +135,7 @@ max_value: 120
 | ------------------------------- | -------- | ------------------------------------------------------ |
 | `entity_today` to `entity_day5` | `sensor` | Daily forecast in kWh                                  |
 | `entity_remaining`              | `sensor` | Optional: remaining value today (in kWh)               |
-| `animation_duration`            | `string` | CSS time (e.g. `0.5s`, `2s`)                            |
+| `animation_duration`            | `string` | CSS time (e.g. `0.5s`, `2s`)                           |
 | `bar_color_start` / `end`       | `string` | Gradient colors for main bars                          |
 | `remaining_color_start` / `end` | `string` | Gradient colors for remaining bar                      |
 | `remaining_threshold`           | `number` | If remaining ≤ this, use `low_color_*`                 |
@@ -141,6 +143,8 @@ max_value: 120
 | `remaining_low_color_end`       | `string` | Alert gradient (end)                                   |
 | `max_value`                     | `number` | Maximum value to normalize bar width                   |
 | `weekday_format`                | `string` | `narrow`, `short`, or `long`                           |
+| `show_tooltips`                 | `string` | `true`, `false` Show tooltip when hovering the bar     |
+| `remain_blink`                  | `string` | `true`, `false` "Rest" bar blinks below threshold      |
 
 ---
 
@@ -152,25 +156,7 @@ max_value: 120
 
 ### 🧩 Beispielkonfiguration (Deutsch)
 
-```yaml
-type: custom:clock-pv-forecast-card
-entity_remaining: sensor.solcast_pv_forecast_prognose_verbleibende_leistung_heute
-entity_today: sensor.solcast_pv_forecast_prognose_heute
-entity_tomorrow: sensor.solcast_pv_forecast_prognose_morgen
-entity_day3: sensor.solcast_pv_forecast_prognose_tag_3
-entity_day4: sensor.solcast_pv_forecast_prognose_tag_4
-entity_day5: sensor.solcast_pv_forecast_prognose_tag_5
-animation_duration: 5s
-bar_color_start: "#ffcc00"
-bar_color_end: "#00cc66"
-weekday_format: short
-remaining_color_start: "#e67e22"
-remaining_color_end: "#f1c40f"
-remaining_threshold: 5
-remaining_low_color_start: "#ff0000"
-remaining_low_color_end: "#ffa500"
-max_value: 120
-```
+Werte siehe oben
 
 In diesem Beispiel:
 - `entity_remaining` zeigt den Rest-Energiebedarf für den Tag.
@@ -178,3 +164,5 @@ In diesem Beispiel:
 - Die Farben und Balkenanimationen lassen sich individuell anpassen.
 - `max_value` legt den Referenzwert für die volle Balkenbreite fest.
 - Ab einem Schwellwert (`remaining_threshold`) ändern sich die Farben für „Rest“.
+- Die "Rest" Anzeige kann blinken wenn sie unter den Schwellwert sinkt (`remaining_blink`)
+- `show_tooltips` - wenn man möchte können Tooltips angezeigt werden, sobald man mit der Maus über den Balken fährt
