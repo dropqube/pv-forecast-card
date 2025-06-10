@@ -44,6 +44,7 @@ class ClockPvForecastCard extends LitElement {
       remaining_low_color_start: config.remaining_low_color_start || '#e74c3c',
       remaining_low_color_end: config.remaining_low_color_end || '#e67e22',
       remaining_blink: config.remaining_blink || false,
+      remaining_text: config.remaining_text || "Rest",
       max_value: config.max_value ?? 100,
       weekday_format: format,
       day_column_width: weekdayWidth[format] || '2.5em',
@@ -150,7 +151,7 @@ class ClockPvForecastCard extends LitElement {
     if (!entityState || entityState.state === 'unavailable' || entityState.state === 'unknown') {
       return html`
         <div class="forecast-row error">
-          <div class="day" style="width: ${this.config.day_column_width}">Rest</div>
+          <div class="day" style="width: ${this.config.day_column_width}">${this.config.remaining_text}</div>
           <div class="bar-container error">
             <div class="error-text">Entity nicht verfügbar</div>
           </div>
@@ -162,7 +163,7 @@ class ClockPvForecastCard extends LitElement {
     if (isNaN(remaining)) {
       return html`
         <div class="forecast-row error">
-          <div class="day" style="width: ${this.config.day_column_width}">Rest</div>
+          <div class="day" style="width: ${this.config.day_column_width}">${this.config.remaining_text}</div>
           <div class="bar-container error">
             <div class="error-text">Ungültiger Wert</div>
           </div>
@@ -178,10 +179,10 @@ class ClockPvForecastCard extends LitElement {
     
     return html`
       <div class="forecast-row">
-        <div class="day" style="width: ${this.config.day_column_width}">Rest</div>
+        <div class="day" style="width: ${this.config.day_column_width}">${this.config.remaining_text}</div>
         <div class="bar-container rtl">
           <div class="bar ${blinkClass}" style="${barStyle}"></div>
-          ${this.config.show_tooltips ? this._renderTooltip(remaining, this.config.entity_remaining, 'Rest') : ''}
+          ${this.config.show_tooltips ? this._renderTooltip(remaining, this.config.entity_remaining, this.config.remaining_text) : ''}
         </div>
         <div class="value">${this._formatValue(remaining, this.config.entity_remaining)}</div>
       </div>`;
