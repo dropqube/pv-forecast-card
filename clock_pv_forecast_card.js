@@ -16,7 +16,7 @@ class ClockPvForecastCard extends LitElement {
 
   setConfig(config) {
     if (!config) {
-      throw new Error('Konfiguration ist erforderlich');
+      throw new Error('Configuration is required');
     }
     
     // Prüfe ob mindestens eine Entity definiert ist
@@ -24,7 +24,7 @@ class ClockPvForecastCard extends LitElement {
       .some(key => config[key]);
     
     if (!hasEntity) {
-      throw new Error('Mindestens eine Forecast-Entity muss definiert sein');
+      throw new Error('At least one forecast entity must be defined');
     }
 
     const weekdayWidth = {
@@ -48,6 +48,7 @@ class ClockPvForecastCard extends LitElement {
       weekday_format: format,
       day_column_width: weekdayWidth[format] || '2.5em',
       entity_remaining: config.entity_remaining || null,
+      remaining_label: config.remaining_label || 'Rest',
       show_tooltips: config.show_tooltips ?? false,
       ...config,
     };
@@ -110,12 +111,12 @@ class ClockPvForecastCard extends LitElement {
     const entityState = this.hass.states[item.entity];
     
     if (!entityState || entityState.state === 'unavailable' || entityState.state === 'unknown') {
-      return this._renderErrorRow(item, index, 'Entity nicht verfügbar');
+      return this._renderErrorRow(item, index, this.hass.localize('state.default.unavailable'));
     }
 
     const value = parseFloat(entityState.state ?? '0');
     if (isNaN(value)) {
-      return this._renderErrorRow(item, index, 'Ungültiger Wert');
+      return this._renderErrorRow(item, index, this.hass.localize('ui.card.weather.unknown'));
     }
 
     const dayLabel = this._getWeekdayName(item.offset);
@@ -146,13 +147,14 @@ class ClockPvForecastCard extends LitElement {
 
   _renderRemainingBar() {
     const entityState = this.hass.states[this.config.entity_remaining];
+    const remainingLabel = this.config.remaining_label;
     
     if (!entityState || entityState.state === 'unavailable' || entityState.state === 'unknown') {
       return html`
         <div class="forecast-row error">
-          <div class="day" style="width: ${this.config.day_column_width}">Rest</div>
+          <div class="day" style="width: ${this.config.day_column_width}">${remainingLabel}</div>
           <div class="bar-container error">
-            <div class="error-text">Entity nicht verfügbar</div>
+            <div class="error-text">${this.hass.localize('state.default.unavailable')}</div>
           </div>
           <div class="value error">-- kWh</div>
         </div>`;
@@ -162,9 +164,9 @@ class ClockPvForecastCard extends LitElement {
     if (isNaN(remaining)) {
       return html`
         <div class="forecast-row error">
-          <div class="day" style="width: ${this.config.day_column_width}">Rest</div>
+          <div class="day" style="width: ${this.config.day_column_width}">${remainingLabel}</div>
           <div class="bar-container error">
-            <div class="error-text">Ungültiger Wert</div>
+            <div class="error-text">${this.hass.localize('ui.card.weather.unknown')}</div>
           </div>
           <div class="value error">-- kWh</div>
         </div>`;
@@ -178,10 +180,10 @@ class ClockPvForecastCard extends LitElement {
     
     return html`
       <div class="forecast-row">
-        <div class="day" style="width: ${this.config.day_column_width}">Rest</div>
+        <div class="day" style="width: ${this.config.day_column_width}">${remainingLabel}</div>
         <div class="bar-container rtl">
           <div class="bar ${blinkClass}" style="${barStyle}"></div>
-          ${this.config.show_tooltips ? this._renderTooltip(remaining, this.config.entity_remaining, 'Rest') : ''}
+          ${this.config.show_tooltips ? this._renderTooltip(remaining, this.config.entity_remaining, remainingLabel) : ''}
         </div>
         <div class="value">${this._formatValue(remaining, this.config.entity_remaining)}</div>
       </div>`;
@@ -189,14 +191,14 @@ class ClockPvForecastCard extends LitElement {
 
   _renderTooltip(value, entity, dayLabel) {
     const state = this.hass.states[entity];
-    const lastUpdated = state?.last_updated ? new Date(state.last_updated).toLocaleString() : 'Unbekannt';
+    const lastUpdated = state?.last_updated ? new Date(state.last_updated).toLocaleString() : this.hass.localize('state.default.unknown');
     
     return html`
       <div class="tooltip">
         <div class="tooltip-content">
           <strong>${dayLabel}</strong><br>
-          Prognose: ${this._formatValue(value, entity)}<br>
-          <small>Aktualisiert: ${lastUpdated}</small>
+          ${this.hass.localize('ui.card.energy.forecast') || 'Forecast'}: ${this._formatValue(value, entity)}<br>
+          <small>${this.hass.localize('ui.card.generic.last_updated') || 'Last updated'}: ${lastUpdated}</small>
         </div>
       </div>
     `;
@@ -237,7 +239,8 @@ class ClockPvForecastCard extends LitElement {
       entity_today: 'sensor.pv_forecast_today',
       entity_tomorrow: 'sensor.pv_forecast_tomorrow',
       max_value: 100,
-      weekday_format: 'short'
+      weekday_format: 'short',
+      remaining_label: 'Rest'
     };
   }
 
