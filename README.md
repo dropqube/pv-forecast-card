@@ -1,6 +1,6 @@
 ## 🔆 clock-pv-forecast-card
 See release notes for new functionality!
-A compact and elegant **solar forecast card** for Home Assistant, displaying five days of PV yield predictions as **animated progress bars**, with **localized weekday labels** and customizable styling.
+A compact and elegant **solar forecast card** for Home Assistant, displaying seven days of PV yield predictions as **animated progress bars**, with **localized weekday labels** and customizable styling.
 
 Heavily inspired by [Clock Weather Card](https://github.com/pkissling/clock-weather-card)
 
@@ -81,7 +81,7 @@ Heavily inspired by [Clock Weather Card](https://github.com/pkissling/clock-weat
    ```
 
 5. **Sensoren prüfen**  
-   Die eingebundenen Sensoren müssen gültige Tagesprognosen in kWh liefern (z. B. Solcast).
+   Die eingebundenen Sensoren müssen gültige Tagesprognosen in kWh liefern (z. B. Solcast).
 
 ---
 
@@ -91,6 +91,9 @@ Heavily inspired by [Clock Weather Card](https://github.com/pkissling/clock-weat
 - Animated bars with customizable colors
 - Responsive and localized layout
 - Optional remaining energy bar (with shrinking animation and alert color)
+- **NEW**: Customizable remaining bar label - change "Remaining" to your preferred text
+- **NEW**: Fully internationalized error messages using Home Assistant's localization system
+- Tooltips with detailed information and last update time
 
 ---
 
@@ -127,6 +130,7 @@ remaining_threshold: 5
 remaining_blink: true
 remaining_low_color_start: "#ff0000"
 remaining_low_color_end: "#ffa500"
+remaining_label: "Battery"
 max_value: 120
 show_tooltips: true
 ```
@@ -139,16 +143,30 @@ show_tooltips: true
 | ------------------------------- | -------- | ------------------------------------------------------ |
 | `entity_today` to `entity_day7` | `sensor` | Daily forecast in kWh / If you have less entities just don't use the respective day |
 | `entity_remaining`              | `sensor` | Optional: remaining value today (in kWh)               |
+| `remaining_label`               | `string` | **NEW**: Custom label for remaining bar (default: "Rest") |
 | `animation_duration`            | `string` | CSS time (e.g. `0.5s`, `2s`)                           |
 | `bar_color_start` / `end`       | `string` | Gradient colors for main bars                          |
 | `remaining_color_start` / `end` | `string` | Gradient colors for remaining bar                      |
 | `remaining_threshold`           | `number` | If remaining ≤ this, use `low_color_*`                 |
 | `remaining_low_color_start`     | `string` | Alert gradient (start)                                 |
 | `remaining_low_color_end`       | `string` | Alert gradient (end)                                   |
+| `remaining_blink`               | `boolean`| Remaining bar blinks below threshold                   |
 | `max_value`                     | `number` | Maximum value to normalize bar width                   |
 | `weekday_format`                | `string` | `narrow`, `short`, or `long`                           |
-| `show_tooltips`                 | `string` | `true`, `false` Show tooltip when hovering the bar     |
-| `remain_blink`                  | `string` | `true`, `false` "Rest" bar blinks below threshold      |
+| `show_tooltips`                 | `boolean`| Show tooltip when hovering the bar                    |
+
+---
+
+### 🌍 Internationalization
+
+The card now uses Home Assistant's built-in localization system for all error messages and labels. This means:
+
+- Error messages like "Unavailable" and "Unknown" will appear in your Home Assistant language
+- Weekday names are automatically localized based on your Home Assistant locale
+- Tooltip text for "Forecast" and "Last updated" will use your system language
+- Fallback to English if a translation is not available
+
+**Supported languages**: All languages supported by Home Assistant's core localization system.
 
 ---
 
@@ -156,17 +174,46 @@ show_tooltips: true
 
 - Use `vertical-stack` or `grid` layouts for better integration
 - Colors can use `var(--theme-color)` from your HA theme
-- Try [Google's color picker](https://www.google.com/search?q=hex+color+picker)---
+- Try [Google's color picker](https://www.google.com/search?q=hex+color+picker)
+- Customize the remaining bar label with `remaining_label` to match your use case (e.g., "Battery", "Available", "Remaining")
+- Enable tooltips with `show_tooltips: true` for detailed information when hovering over bars
+
+---
 
 ### 🧩 Beispielkonfiguration (Deutsch)
 
-Werte siehe oben
+```yaml
+type: custom:clock-pv-forecast-card
+entity_remaining: sensor.solcast_pv_forecast_prognose_verbleibende_leistung_heute
+entity_today: sensor.solcast_pv_forecast_prognose_heute
+entity_tomorrow: sensor.solcast_pv_forecast_prognose_morgen
+entity_day3: sensor.solcast_pv_forecast_prognose_tag_3
+entity_day4: sensor.solcast_pv_forecast_prognose_tag_4
+entity_day5: sensor.solcast_pv_forecast_prognose_tag_5
+entity_day6: sensor.solcast_pv_forecast_prognose_tag_6
+entity_day7: sensor.solcast_pv_forecast_prognose_tag_7
+animation_duration: 5s
+bar_color_start: "#ffcc00"
+bar_color_end: "#00cc66"
+weekday_format: short
+remaining_color_start: "#e67e22"
+remaining_color_end: "#f1c40f"
+remaining_threshold: 5
+remaining_blink: true
+remaining_low_color_start: "#ff0000"
+remaining_low_color_end: "#ffa500"
+remaining_label: "Batterie"
+max_value: 120
+show_tooltips: true
+```
 
 In diesem Beispiel:
 - `entity_remaining` zeigt den Rest-Energiebedarf für den Tag.
-- `weekday_format` steuert die Darstellung der Wochentage (`short` → z. B. „Mo“).
+- `remaining_label` erlaubt es, den Text "Rest" durch eigenen Text zu ersetzen (z.B. "Batterie", "Verfügbar").
+- `weekday_format` steuert die Darstellung der Wochentage (`short` → z. B. „Mo").
 - Die Farben und Balkenanimationen lassen sich individuell anpassen.
 - `max_value` legt den Referenzwert für die volle Balkenbreite fest.
-- Ab einem Schwellwert (`remaining_threshold`) ändern sich die Farben für „Rest“.
-- Die "Rest" Anzeige kann blinken wenn sie unter den Schwellwert sinkt (`remaining_blink`)
-- `show_tooltips` - wenn man möchte können Tooltips angezeigt werden, sobald man mit der Maus über den Balken fährt
+- Ab einem Schwellwert (`remaining_threshold`) ändern sich die Farben für die verbleibende Energie.
+- Die Anzeige für verbleibende Energie kann blinken wenn sie unter den Schwellwert sinkt (`remaining_blink`)
+- `show_tooltips` - wenn aktiviert werden Tooltips angezeigt, sobald man mit der Maus über den Balken fährt
+- **NEU**: Alle Fehlermeldungen werden automatisch in der in Home Assistant eingestellten Sprache angezeigt
