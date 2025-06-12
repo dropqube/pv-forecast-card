@@ -91,8 +91,12 @@ Heavily inspired by [Clock Weather Card](https://github.com/pkissling/clock-weat
 - Animated bars with customizable colors
 - Responsive and localized layout
 - Optional remaining energy bar (with shrinking animation and alert color)
-- **NEW**: Customizable remaining bar label - change "Remaining" to your preferred text
-- **NEW**: Fully internationalized error messages using Home Assistant's localization system
+- **NEW**: Three display modes for day labels:
+  - **Weekday mode**: Traditional weekday names (Mon, Tue, etc.)
+  - **Date mode**: Short date format (12.6., Jun 12, etc.) - respects your system locale
+  - **Relative mode**: Relative day indicators (Today, Tomorrow, +2d, +3d, etc.)
+- Customizable remaining bar label - change "Remaining" to your preferred text
+- Fully internationalized error messages using Home Assistant's localization system
 - Tooltips with detailed information and last update time
 
 ---
@@ -106,12 +110,46 @@ Heavily inspired by [Clock Weather Card](https://github.com/pkissling/clock-weat
 
 ---
 
-### 🧩 Example Configuration
+### 🧩 Example Configurations
 
-If you have no use for a day entity - just don't use the line :) you choose what you want to display! same goes for the "Rest" (remaining) bar
-
+#### Traditional Weekday Display (Default)
 ```yaml
 type: custom:clock-pv-forecast-card
+display_mode: weekday        # Shows: Mon, Tue, Wed, etc.
+weekday_format: short        # Options: narrow, short, long
+entity_today: sensor.solcast_pv_forecast_prognose_heute
+entity_tomorrow: sensor.solcast_pv_forecast_prognose_morgen
+entity_day3: sensor.solcast_pv_forecast_prognose_tag_3
+# ... more entities as needed
+```
+
+#### Date Display Mode
+```yaml
+type: custom:clock-pv-forecast-card
+display_mode: date           # Shows dates instead of weekdays
+date_format: numeric         # Shows: 12.6. or 6/12 (based on locale)
+# date_format: short         # Alternative: 12. Jun or Jun 12
+entity_today: sensor.solcast_pv_forecast_prognose_heute
+entity_tomorrow: sensor.solcast_pv_forecast_prognose_morgen
+entity_day3: sensor.solcast_pv_forecast_prognose_tag_3
+# ... more entities as needed
+```
+
+#### Relative Day Display Mode
+```yaml
+type: custom:clock-pv-forecast-card
+display_mode: relative       # Shows: Today, Tomorrow, +2d, +3d, etc.
+entity_today: sensor.solcast_pv_forecast_prognose_heute
+entity_tomorrow: sensor.solcast_pv_forecast_prognose_morgen
+entity_day3: sensor.solcast_pv_forecast_prognose_tag_3
+# ... more entities as needed
+```
+
+#### Full Configuration Example
+```yaml
+type: custom:clock-pv-forecast-card
+display_mode: date
+date_format: numeric
 entity_remaining: sensor.solcast_pv_forecast_prognose_verbleibende_leistung_heute
 entity_today: sensor.solcast_pv_forecast_prognose_heute
 entity_tomorrow: sensor.solcast_pv_forecast_prognose_morgen
@@ -123,7 +161,6 @@ entity_day7: sensor.solcast_pv_forecast_prognose_tag_7
 animation_duration: 5s
 bar_color_start: "#ffcc00"
 bar_color_end: "#00cc66"
-weekday_format: short
 remaining_color_start: "#e67e22"
 remaining_color_end: "#f1c40f"
 remaining_threshold: 5
@@ -143,7 +180,10 @@ show_tooltips: true
 | ------------------------------- | -------- | ------------------------------------------------------ |
 | `entity_today` to `entity_day7` | `sensor` | Daily forecast in kWh / If you have less entities just don't use the respective day |
 | `entity_remaining`              | `sensor` | Optional: remaining value today (in kWh)               |
-| `remaining_label`               | `string` | **NEW**: Custom label for remaining bar (default: "Rest") |
+| `display_mode`                  | `string` | **NEW**: Display mode: `weekday`, `date`, or `relative` (default: `weekday`) |
+| `weekday_format`                | `string` | For weekday mode: `narrow`, `short`, or `long` (default: `short`) |
+| `date_format`                   | `string` | For date mode: `short` (12. Jun) or `numeric` (12.6.) (default: `short`) |
+| `remaining_label`               | `string` | Custom label for remaining bar (default: "Rest") |
 | `animation_duration`            | `string` | CSS time (e.g. `0.5s`, `2s`)                           |
 | `bar_color_start` / `end`       | `string` | Gradient colors for main bars                          |
 | `remaining_color_start` / `end` | `string` | Gradient colors for remaining bar                      |
@@ -152,8 +192,25 @@ show_tooltips: true
 | `remaining_low_color_end`       | `string` | Alert gradient (end)                                   |
 | `remaining_blink`               | `boolean`| Remaining bar blinks below threshold                   |
 | `max_value`                     | `number` | Maximum value to normalize bar width                   |
-| `weekday_format`                | `string` | `narrow`, `short`, or `long`                           |
 | `show_tooltips`                 | `boolean`| Show tooltip when hovering the bar                    |
+
+#### Display Mode Options Explained
+
+**`display_mode: weekday`** (Default)
+- Shows traditional weekday names
+- Requires: `weekday_format` option
+- Example output: "Mon", "Tue", "Wed" (short format)
+
+**`display_mode: date`**
+- Shows actual dates instead of weekday names
+- Requires: `date_format` option
+- Respects your Home Assistant locale settings
+- Example output: "12.6." (German), "6/12" (US), "Jun 12" (short format)
+
+**`display_mode: relative`**
+- Shows relative day indicators
+- No additional options required
+- Example output: "Today", "Tomorrow", "+2d", "+3d", "+4d", "+5d", "+6d"
 
 ---
 
@@ -163,6 +220,7 @@ The card now uses Home Assistant's built-in localization system for all error me
 
 - Error messages like "Unavailable" and "Unknown" will appear in your Home Assistant language
 - Weekday names are automatically localized based on your Home Assistant locale
+- Date formats respect your system locale (German: "12.6.", US: "6/12", etc.)
 - Tooltip text for "Forecast" and "Last updated" will use your system language
 - Fallback to English if a translation is not available
 
@@ -177,13 +235,69 @@ The card now uses Home Assistant's built-in localization system for all error me
 - Try [Google's color picker](https://www.google.com/search?q=hex+color+picker)
 - Customize the remaining bar label with `remaining_label` to match your use case (e.g., "Battery", "Available", "Remaining")
 - Enable tooltips with `show_tooltips: true` for detailed information when hovering over bars
+- Column width automatically adjusts based on your chosen display mode
+- Date mode is perfect for weekly planning, relative mode for quick at-a-glance information
 
 ---
 
-### 🧩 Beispielkonfiguration (Deutsch)
+### 🇩🇪 Deutsche Dokumentation
 
+### 📦 Funktionen
+
+- 7-Tage PV-Prognose mit wählbaren Tagen
+- Animierte Balken mit anpassbaren Farben
+- Responsive und lokalisierte Darstellung
+- Optionaler Verbrauchsbalken mit Warnfunktion
+- **NEU**: Drei Anzeigemodi für Tageslabels:
+  - **Wochentag-Modus**: Traditionelle Wochentagsnamen (Mo, Di, etc.)
+  - **Datums-Modus**: Kurzes Datumsformat (12.6., 12. Jun, etc.) - respektiert die Systemsprache
+  - **Relativer Modus**: Relative Tagesangaben (Heute, Morgen, +2d, +3d, etc.)
+- Anpassbares Label für Verbrauchsbalken
+- Vollständig internationalisierte Fehlermeldungen
+- Tooltips mit detaillierten Informationen
+
+---
+
+### 🧩 Beispielkonfigurationen
+
+#### Traditionelle Wochentagsanzeige (Standard)
 ```yaml
 type: custom:clock-pv-forecast-card
+display_mode: weekday        # Zeigt: Mo, Di, Mi, etc.
+weekday_format: short        # Optionen: narrow, short, long
+entity_today: sensor.solcast_pv_forecast_prognose_heute
+entity_tomorrow: sensor.solcast_pv_forecast_prognose_morgen
+entity_day3: sensor.solcast_pv_forecast_prognose_tag_3
+# ... weitere Entitäten nach Bedarf
+```
+
+#### Datums-Anzeigemodus
+```yaml
+type: custom:clock-pv-forecast-card
+display_mode: date           # Zeigt Daten statt Wochentage
+date_format: numeric         # Zeigt: 12.6. (Deutschland) oder 6/12 (USA)
+# date_format: short         # Alternative: 12. Jun
+entity_today: sensor.solcast_pv_forecast_prognose_heute
+entity_tomorrow: sensor.solcast_pv_forecast_prognose_morgen
+entity_day3: sensor.solcast_pv_forecast_prognose_tag_3
+# ... weitere Entitäten nach Bedarf
+```
+
+#### Relativer Tage-Anzeigemodus
+```yaml
+type: custom:clock-pv-forecast-card
+display_mode: relative       # Zeigt: Heute, Morgen, +2d, +3d, etc.
+entity_today: sensor.solcast_pv_forecast_prognose_heute
+entity_tomorrow: sensor.solcast_pv_forecast_prognose_morgen
+entity_day3: sensor.solcast_pv_forecast_prognose_tag_3
+# ... weitere Entitäten nach Bedarf
+```
+
+#### Vollständige Beispielkonfiguration
+```yaml
+type: custom:clock-pv-forecast-card
+display_mode: date
+date_format: numeric
 entity_remaining: sensor.solcast_pv_forecast_prognose_verbleibende_leistung_heute
 entity_today: sensor.solcast_pv_forecast_prognose_heute
 entity_tomorrow: sensor.solcast_pv_forecast_prognose_morgen
@@ -191,11 +305,10 @@ entity_day3: sensor.solcast_pv_forecast_prognose_tag_3
 entity_day4: sensor.solcast_pv_forecast_prognose_tag_4
 entity_day5: sensor.solcast_pv_forecast_prognose_tag_5
 entity_day6: sensor.solcast_pv_forecast_prognose_tag_6
-entity_day7: sensor.solcast_pv_forecast_prognose_tag_7
+entity_day7: ser.solcast_pv_forecast_prognose_tag_7
 animation_duration: 5s
 bar_color_start: "#ffcc00"
 bar_color_end: "#00cc66"
-weekday_format: short
 remaining_color_start: "#e67e22"
 remaining_color_end: "#f1c40f"
 remaining_threshold: 5
@@ -207,13 +320,60 @@ max_value: 120
 show_tooltips: true
 ```
 
-In diesem Beispiel:
-- `entity_remaining` zeigt den Rest-Energiebedarf für den Tag.
-- `remaining_label` erlaubt es, den Text "Rest" durch eigenen Text zu ersetzen (z.B. "Batterie", "Verfügbar").
-- `weekday_format` steuert die Darstellung der Wochentage (`short` → z. B. „Mo").
-- Die Farben und Balkenanimationen lassen sich individuell anpassen.
-- `max_value` legt den Referenzwert für die volle Balkenbreite fest.
-- Ab einem Schwellwert (`remaining_threshold`) ändern sich die Farben für die verbleibende Energie.
-- Die Anzeige für verbleibende Energie kann blinken wenn sie unter den Schwellwert sinkt (`remaining_blink`)
-- `show_tooltips` - wenn aktiviert werden Tooltips angezeigt, sobald man mit der Maus über den Balken fährt
-- **NEU**: Alle Fehlermeldungen werden automatisch in der in Home Assistant eingestellten Sprache angezeigt
+---
+
+### 🔧 Konfigurationsoptionen (Deutsch)
+
+| Option                          | Typ      | Beschreibung                                           |
+| ------------------------------- | -------- | ------------------------------------------------------ |
+| `entity_today` bis `entity_day7`| `sensor` | Tagesprognose in kWh / Nicht benötigte Tage einfach weglassen |
+| `entity_remaining`              | `sensor` | Optional: Verbleibender Wert heute (in kWh)           |
+| `display_mode`                  | `string` | **NEU**: Anzeigemodus: `weekday`, `date`, oder `relative` (Standard: `weekday`) |
+| `weekday_format`                | `string` | Für Wochentag-Modus: `narrow`, `short`, oder `long` (Standard: `short`) |
+| `date_format`                   | `string` | Für Datums-Modus: `short` (12. Jun) oder `numeric` (12.6.) (Standard: `short`) |
+| `remaining_label`               | `string` | Angepasstes Label für Verbrauchsbalken (Standard: "Rest") |
+| `animation_duration`            | `string` | CSS-Zeit (z.B. `0.5s`, `2s`)                          |
+| `bar_color_start` / `end`       | `string` | Verlaufsfarben für Hauptbalken                        |
+| `remaining_color_start` / `end` | `string` | Verlaufsfarben für Verbrauchsbalken                   |
+| `remaining_threshold`           | `number` | Bei verbleibendem Wert ≤ diesem, nutze `low_color_*`   |
+| `remaining_low_color_start`     | `string` | Alarm-Verlauf (Start)                                  |
+| `remaining_low_color_end`       | `string` | Alarm-Verlauf (Ende)                                   |
+| `remaining_blink`               | `boolean`| Verbrauchsbalken blinkt unter Schwellwert             |
+| `max_value`                     | `number` | Maximalwert für Balkennormalisierung                   |
+| `show_tooltips`                 | `boolean`| Tooltip beim Hover über Balken anzeigen               |
+
+#### Anzeigemodus-Optionen erklärt
+
+**`display_mode: weekday`** (Standard)
+- Zeigt traditionelle Wochentagsnamen
+- Benötigt: `weekday_format` Option
+- Beispielausgabe: "Mo", "Di", "Mi" (short Format)
+
+**`display_mode: date`**
+- Zeigt echte Daten statt Wochentagsnamen
+- Benötigt: `date_format` Option
+- Respektiert Home Assistant Locale-Einstellungen
+- Beispielausgabe: "12.6." (Deutsch), "6/12" (USA), "12. Jun" (short Format)
+
+**`display_mode: relative`**
+- Zeigt relative Tagesangaben
+- Keine zusätzlichen Optionen erforderlich
+- Beispielausgabe: "Heute", "Morgen", "+2d", "+3d", "+4d", "+5d", "+6d"
+
+---
+
+### 💡 Tipps (Deutsch)
+
+- Nutze `vertical-stack` oder `grid` Layouts für bessere Integration
+- Farben können `var(--theme-color)` aus deinem HA-Theme verwenden
+- Probiere [Google's Farbwähler](https://www.google.com/search?q=hex+color+picker) aus
+- Passe das Verbrauchsbalken-Label mit `remaining_label` an deinen Anwendungsfall an (z.B. "Batterie", "Verfügbar", "Rest")
+- Aktiviere Tooltips mit `show_tooltips: true` für detaillierte Informationen beim Hover über Balken
+- Die Spaltenbreite passt sich automatisch an den gewählten Anzeigemodus an
+- Datums-Modus ist perfekt für Wochenplanung, relativer Modus für schnelle Übersichtsinformationen
+
+**Wichtige Konfigurationshinweise:**
+- Bei `display_mode: weekday` muss `weekday_format` gesetzt werden
+- Bei `display_mode: date` muss `date_format` gesetzt werden  
+- Bei `display_mode: relative` sind keine weiteren Optionen erforderlich
+- Die Karte ist vollständig rückwärtskompatibel - bestehende Konfigurationen funktionieren weiterhin ohne Änderungen
