@@ -94,7 +94,7 @@ Heavily inspired by [Clock Weather Card](https://github.com/pkissling/clock-weat
 - **NEW**: Three display modes for day labels:
   - **Weekday mode**: Traditional weekday names (Mon, Tue, etc.)
   - **Date mode**: Short date format (12.6., Jun 12, etc.) - respects your system locale
-  - **Relative mode**: Relative day indicators (Today, Tomorrow, +2d, +3d, etc.)
+  - **Relative mode**: Relative day indicators (Today, Tomorrow, +2d, +3d, etc.; optional +1d for tomorrow)
 - Customizable remaining bar label - change "Remaining" to your preferred text
 - Fully internationalized error messages using Home Assistant's localization system
 - Tooltips with detailed information and last update time
@@ -139,6 +139,7 @@ entity_day3: sensor.solcast_pv_forecast_prognose_tag_3
 ```yaml
 type: custom:clock-pv-forecast-card
 display_mode: relative       # Shows: Today, Tomorrow, +2d, +3d, etc.
+relative_plus_one: true     # Optional: show "+1d" instead of "Tomorrow"
 entity_today: sensor.solcast_pv_forecast_prognose_heute
 entity_tomorrow: sensor.solcast_pv_forecast_prognose_morgen
 entity_day3: sensor.solcast_pv_forecast_prognose_tag_3
@@ -193,6 +194,7 @@ show_tooltips: true
 | `remaining_blink`               | `boolean`| Remaining bar blinks below threshold                   |
 | `max_value`                     | `number` | Maximum value to normalize bar width                   |
 | `show_tooltips`                 | `boolean`| Show tooltip when hovering the bar                    |
+| `relative_plus_one`             | `boolean`| In relative mode show "+1d" instead of "Tomorrow" (default: `false`) |
 
 #### Display Mode Options Explained
 
@@ -209,7 +211,7 @@ show_tooltips: true
 
 **`display_mode: relative`**
 - Shows relative day indicators
-- No additional options required
+- Optional: set `relative_plus_one: true` to display "+1d" instead of "Tomorrow"
 - Example output: "Today", "Tomorrow", "+2d", "+3d", "+4d", "+5d", "+6d"
 
 ---
@@ -236,7 +238,7 @@ The card now uses Home Assistant's built-in localization system for all error me
 - Customize the remaining bar label with `remaining_label` to match your use case (e.g., "Battery", "Available", "Remaining")
 - Enable tooltips with `show_tooltips: true` for detailed information when hovering over bars
 - Column width automatically adjusts based on your chosen display mode
-- Date mode is perfect for weekly planning, relative mode for quick at-a-glance information
+- Date mode is perfect for weekly planning, relative mode for quick at-a-glance information (use `relative_plus_one` for "+1d" tomorrow)
 
 ---
 
@@ -251,7 +253,7 @@ The card now uses Home Assistant's built-in localization system for all error me
 - **NEU**: Drei Anzeigemodi für Tageslabels:
   - **Wochentag-Modus**: Traditionelle Wochentagsnamen (Mo, Di, etc.)
   - **Datums-Modus**: Kurzes Datumsformat (12.6., 12. Jun, etc.) - respektiert die Systemsprache
-  - **Relativer Modus**: Relative Tagesangaben (Heute, Morgen, +2d, +3d, etc.)
+  - **Relativer Modus**: Relative Tagesangaben (Heute, Morgen, +2d, +3d, etc.; optional +1d für Morgen)
 - Anpassbares Label für Verbrauchsbalken
 - Vollständig internationalisierte Fehlermeldungen
 - Tooltips mit detaillierten Informationen
@@ -287,6 +289,7 @@ entity_day3: sensor.solcast_pv_forecast_prognose_tag_3
 ```yaml
 type: custom:clock-pv-forecast-card
 display_mode: relative       # Zeigt: Heute, Morgen, +2d, +3d, etc.
+relative_plus_one: true     # Optional: "+1d" statt "Morgen" anzeigen
 entity_today: sensor.solcast_pv_forecast_prognose_heute
 entity_tomorrow: sensor.solcast_pv_forecast_prognose_morgen
 entity_day3: sensor.solcast_pv_forecast_prognose_tag_3
@@ -341,6 +344,7 @@ show_tooltips: true
 | `remaining_blink`               | `boolean`| Verbrauchsbalken blinkt unter Schwellwert             |
 | `max_value`                     | `number` | Maximalwert für Balkennormalisierung                   |
 | `show_tooltips`                 | `boolean`| Tooltip beim Hover über Balken anzeigen               |
+| `relative_plus_one`             | `boolean`| Im relativen Modus "+1d" statt "Morgen" anzeigen (Standard: `false`) |
 
 #### Anzeigemodus-Optionen erklärt
 
@@ -357,7 +361,7 @@ show_tooltips: true
 
 **`display_mode: relative`**
 - Zeigt relative Tagesangaben
-- Keine zusätzlichen Optionen erforderlich
+- Optional kannst du mit `relative_plus_one: true` statt "Morgen" "+1d" anzeigen
 - Beispielausgabe: "Heute", "Morgen", "+2d", "+3d", "+4d", "+5d", "+6d"
 
 ---
@@ -370,10 +374,10 @@ show_tooltips: true
 - Passe das Verbrauchsbalken-Label mit `remaining_label` an deinen Anwendungsfall an (z.B. "Batterie", "Verfügbar", "Rest")
 - Aktiviere Tooltips mit `show_tooltips: true` für detaillierte Informationen beim Hover über Balken
 - Die Spaltenbreite passt sich automatisch an den gewählten Anzeigemodus an
-- Datums-Modus ist perfekt für Wochenplanung, relativer Modus für schnelle Übersichtsinformationen
+- Datums-Modus ist perfekt für Wochenplanung, relativer Modus für schnelle Übersichtsinformationen (nutze `relative_plus_one` für "+1d" morgen)
 
 **Wichtige Konfigurationshinweise:**
 - Bei `display_mode: weekday` muss `weekday_format` gesetzt werden
-- Bei `display_mode: date` muss `date_format` gesetzt werden  
-- Bei `display_mode: relative` sind keine weiteren Optionen erforderlich
+- Bei `display_mode: date` muss `date_format` gesetzt werden
+- Bei `display_mode: relative` kannst du optional `relative_plus_one: true` setzen, um "+1d" für Morgen anzuzeigen
 - Die Karte ist vollständig rückwärtskompatibel - bestehende Konfigurationen funktionieren weiterhin ohne Änderungen
