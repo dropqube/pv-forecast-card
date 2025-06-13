@@ -1,7 +1,7 @@
-// clock-pv-forecast-card Version 0.024 – Enhanced with error handling, accessibility and performance
+// clock-pv-forecast-card Version 0.025 – Enhanced with date and relative day display options
 import { LitElement, html, css } from 'https://unpkg.com/lit@2.8.0/index.js?module';
 
-console.info("📦 clock-pv-forecast-card v0.024 loaded");
+console.info("📦 clock-pv-forecast-card v0.025 loaded");
 
 class ClockPvForecastCard extends LitElement {
   static properties = {
@@ -12,6 +12,7 @@ class ClockPvForecastCard extends LitElement {
   constructor() {
     super();
     this._weekdayCache = {};
+    this._dateCache = {};
   }
 
   setConfig(config) {
@@ -27,12 +28,23 @@ class ClockPvForecastCard extends LitElement {
       throw new Error('At least one forecast entity must be defined');
     }
 
-    const weekdayWidth = {
-      narrow: '1.5em',
-      short: '2.5em',
-      long: '5em',
-    };
-    const format = config.weekday_format || 'short';
+    // Bestimme die Spaltenbreite basierend auf dem Display-Modus
+    const displayMode = config.display_mode || 'weekday';
+    let dayColumnWidth;
+    
+    if (displayMode === 'date') {
+      dayColumnWidth = config.day_column_width || '3.5em';
+    } else if (displayMode === 'relative') {
+      dayColumnWidth = config.day_column_width || '2.5em';
+    } else { // weekday mode
+      const weekdayWidth = {
+        narrow: '1.5em',
+        short: '2.5em',
+        long: '5em',
+      };
+      const format = config.weekday_format || 'short';
+      dayColumnWidth = weekdayWidth[format] || '2.5em';
+    }
 
     this.config = {
       animation_duration: config.animation_duration || '1s',
@@ -45,8 +57,10 @@ class ClockPvForecastCard extends LitElement {
       remaining_low_color_end: config.remaining_low_color_end || '#e67e22',
       remaining_blink: config.remaining_blink || false,
       max_value: config.max_value ?? 100,
-      weekday_format: format,
-      day_column_width: weekdayWidth[format] || '2.5em',
+      weekday_format: config.weekday_format || 'short',
+      display_mode: displayMode, // 'weekday', 'date', or 'relative'
+      date_format: config.date_format || 'short', // 'short', 'numeric'
+      day_column_width: dayColumnWidth,
       entity_remaining: config.entity_remaining || null,
       remaining_label: config.remaining_label || 'Rest',
       show_tooltips: config.show_tooltips ?? false,
@@ -55,6 +69,7 @@ class ClockPvForecastCard extends LitElement {
 
     // Cache leeren bei Konfigurationsänderung
     this._weekdayCache = {};
+    this._dateCache = {};
   }
 
   shouldUpdate(changedProperties) {
@@ -119,7 +134,7 @@ class ClockPvForecastCard extends LitElement {
       return this._renderErrorRow(item, index, this.hass.localize('ui.card.weather.unknown'));
     }
 
-    const dayLabel = this._getWeekdayName(item.offset);
+    const dayLabel = this._getDayLabel(item.offset);
     const barStyle = `--bar-width: ${this._barWidth(value)}%; --bar-gradient: linear-gradient(to right, ${this.config.bar_color_start}, ${this.config.bar_color_end}); --animation-time: ${this.config.animation_duration}`;
     
     return html`
@@ -134,7 +149,7 @@ class ClockPvForecastCard extends LitElement {
   }
 
   _renderErrorRow(item, index, errorMessage) {
-    const dayLabel = this._getWeekdayName(item.offset);
+    const dayLabel = this._getDayLabel(item.offset);
     return html`
       <div class="forecast-row error" role="row" aria-label="Tag ${index + 1} - Fehler">
         <div class="day" role="cell" style="width: ${this.config.day_column_width}">${dayLabel}</div>
@@ -210,9 +225,20 @@ class ClockPvForecastCard extends LitElement {
     return `${value.toFixed(1)} ${unit}`;
   }
 
+  _getDayLabel(offset) {
+    switch (this.config.display_mode) {
+      case 'date':
+        return this._getDateLabel(offset);
+      case 'relative':
+        return this._getRelativeLabel(offset);
+      default:
+        return this._getWeekdayName(offset);
+    }
+  }
+
   _getWeekdayName(offset) {
     const locale = this.hass.locale?.language || navigator.language || 'en';
-    const cacheKey = `${offset}-${locale}-${this.config.weekday_format}`;
+    const cacheKey = `weekday-${offset}-${locale}-${this.config.weekday_format}`;
     
     if (!this._weekdayCache[cacheKey]) {
       const date = new Date();
@@ -223,6 +249,42 @@ class ClockPvForecastCard extends LitElement {
     }
     
     return this._weekdayCache[cacheKey];
+  }
+
+  _getDateLabel(offset) {
+    const locale = this.hass.locale?.language || navigator.language || 'en';
+    const cacheKey = `date-${offset}-${locale}-${this.config.date_format}`;
+    
+    if (!this._dateCache[cacheKey]) {
+      const date = new Date();
+      date.setDate(date.getDate() + offset);
+      
+      if (this.config.date_format === 'numeric') {
+        // Numerisches Format: z.B. "12.6." oder "6/12" je nach Locale
+        this._dateCache[cacheKey] = date.toLocaleDateString(locale, { 
+          day: 'numeric',
+          month: 'numeric'
+        });
+      } else {
+        // Kurzes Format: z.B. "12.6." oder "Jun 12" je nach Locale
+        this._dateCache[cacheKey] = date.toLocaleDateString(locale, { 
+          day: 'numeric',
+          month: 'short'
+        });
+      }
+    }
+    
+    return this._dateCache[cacheKey];
+  }
+
+  _getRelativeLabel(offset) {
+    if (offset === 0) {
+      return 'Heute';
+    } else if (offset === 1) {
+      return 'Morgen';
+    } else {
+      return `+${offset}d`;
+    }
   }
 
   _barWidth(value) {
@@ -239,7 +301,9 @@ class ClockPvForecastCard extends LitElement {
       entity_today: 'sensor.pv_forecast_today',
       entity_tomorrow: 'sensor.pv_forecast_tomorrow',
       max_value: 100,
+      display_mode: 'weekday',
       weekday_format: 'short',
+      date_format: 'short',
       remaining_label: 'Rest'
     };
   }
