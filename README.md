@@ -1,4 +1,4 @@
-## 🔆 clock-pv-forecast-card
+## 🔆 pv-forecast-card
 See release notes for new functionality!
 A compact and elegant **solar forecast card** for Home Assistant, displaying seven days of PV yield predictions as **animated progress bars**, with **localized weekday labels** and customizable styling.
 
