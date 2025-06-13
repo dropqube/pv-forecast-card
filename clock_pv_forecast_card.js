@@ -60,6 +60,7 @@ class ClockPvForecastCard extends LitElement {
       weekday_format: config.weekday_format || 'short',
       display_mode: displayMode, // 'weekday', 'date', or 'relative'
       date_format: config.date_format || 'short', // 'short', 'numeric'
+      relative_plus_one: config.relative_plus_one || false,
       day_column_width: dayColumnWidth,
       entity_remaining: config.entity_remaining || null,
       remaining_label: config.remaining_label || 'Rest',
@@ -281,7 +282,7 @@ class ClockPvForecastCard extends LitElement {
     if (offset === 0) {
       return 'Heute';
     } else if (offset === 1) {
-      return 'Morgen';
+      return this.config.relative_plus_one ? '+1d' : 'Morgen';
     } else {
       return `+${offset}d`;
     }
@@ -304,7 +305,8 @@ class ClockPvForecastCard extends LitElement {
       display_mode: 'weekday',
       weekday_format: 'short',
       date_format: 'short',
-      remaining_label: 'Rest'
+      remaining_label: 'Rest',
+      relative_plus_one: false
     };
   }
 
