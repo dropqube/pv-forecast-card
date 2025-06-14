@@ -1,4 +1,4 @@
-// clock-pv-forecast-card Version 0.025 – Enhanced with date and relative day display options
+// pv-forecast-card
 import { LitElement, html, css } from 'https://unpkg.com/lit@2.8.0/index.js?module';
 
 console.info("📦 clock-pv-forecast-card v0.025 loaded");
@@ -280,9 +280,9 @@ class ClockPvForecastCard extends LitElement {
 
   _getRelativeLabel(offset) {
     if (offset === 0) {
-      return 'Heute';
+      return this.hass.localize('ui.components.relative_time.today') || 'Today';
     } else if (offset === 1) {
-      return this.config.relative_plus_one ? '+1d' : 'Morgen';
+      return this.config.relative_plus_one ? '+1d' : (this.hass.localize('ui.components.relative_time.tomorrow') || 'Tomorrow');
     } else {
       return `+${offset}d`;
     }
