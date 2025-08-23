@@ -1,316 +1,56 @@
-// pv-forecast-card
-import { LitElement, html, css } from 'https://unpkg.com/lit@2.8.0/index.js?module';
-
-console.info("📦 clock-pv-forecast-card v0.025 loaded");
-
-class ClockPvForecastCard extends LitElement {
-  static properties = {
-    hass: {},
-    config: {},
-  };
-
-  constructor() {
-    super();
-    this._weekdayCache = {};
-    this._dateCache = {};
-  }
-
-  setConfig(config) {
-    if (!config) {
-      throw new Error('Configuration is required');
-    }
-    
-    // Prüfe ob mindestens eine Entity definiert ist
-    const hasEntity = ['entity_today', 'entity_tomorrow', 'entity_day3', 'entity_day4', 'entity_day5', 'entity_day6', 'entity_day7']
-      .some(key => config[key]);
-    
-    if (!hasEntity) {
-      throw new Error('At least one forecast entity must be defined');
-    }
-
-    // Bestimme die Spaltenbreite basierend auf dem Display-Modus
-    const displayMode = config.display_mode || 'weekday';
-    let dayColumnWidth;
-    
-    if (displayMode === 'date') {
-      dayColumnWidth = config.day_column_width || '3.5em';
-    } else if (displayMode === 'relative') {
-      dayColumnWidth = config.day_column_width || '2.5em';
-    } else { // weekday mode
-      const weekdayWidth = {
-        narrow: '1.5em',
-        short: '2.5em',
-        long: '5em',
-      };
-      const format = config.weekday_format || 'short';
-      dayColumnWidth = weekdayWidth[format] || '2.5em';
-    }
-
-    this.config = {
-      animation_duration: config.animation_duration || '1s',
-      bar_color_start: config.bar_color_start || '#3498db',
-      bar_color_end: config.bar_color_end || '#2ecc71',
-      remaining_color_start: config.remaining_color_start || '#999999',
-      remaining_color_end: config.remaining_color_end || '#cccccc',
-      remaining_threshold: config.remaining_threshold ?? null,
-      remaining_low_color_start: config.remaining_low_color_start || '#e74c3c',
-      remaining_low_color_end: config.remaining_low_color_end || '#e67e22',
-      remaining_blink: config.remaining_blink || false,
-      max_value: config.max_value ?? 100,
-      weekday_format: config.weekday_format || 'short',
-      display_mode: displayMode, // 'weekday', 'date', or 'relative'
-      date_format: config.date_format || 'short', // 'short', 'numeric'
-      relative_plus_one: config.relative_plus_one || false,
-      day_column_width: dayColumnWidth,
-      entity_remaining: config.entity_remaining || null,
-      remaining_label: config.remaining_label || 'Rest',
-      show_tooltips: config.show_tooltips ?? false,
-      ...config,
-    };
-
-    // Cache leeren bei Konfigurationsänderung
-    this._weekdayCache = {};
-    this._dateCache = {};
-  }
-
-  shouldUpdate(changedProperties) {
-    if (changedProperties.has('config')) {
-      return true;
-    }
-    
-    if (changedProperties.has('hass')) {
-      const oldHass = changedProperties.get('hass');
-      if (!oldHass) return true;
-
-      const entities = [
-        this.config.entity_today,
-        this.config.entity_tomorrow,
-        this.config.entity_day3,
-        this.config.entity_day4,
-        this.config.entity_day5,
-        this.config.entity_day6,
-        this.config.entity_day7,
-        this.config.entity_remaining,
-      ].filter(Boolean);
-      
-      return entities.some(entity => 
-        this.hass.states[entity]?.state !== oldHass.states[entity]?.state ||
-        this.hass.states[entity]?.last_updated !== oldHass.states[entity]?.last_updated
-      );
-    }
-    
-    return false;
-  }
-
-  render() {
-    const forecast = [
-      this.config.entity_today && { offset: 0, entity: this.config.entity_today },
-      this.config.entity_tomorrow && { offset: 1, entity: this.config.entity_tomorrow },
-      this.config.entity_day3 && { offset: 2, entity: this.config.entity_day3 },
-      this.config.entity_day4 && { offset: 3, entity: this.config.entity_day4 },
-      this.config.entity_day5 && { offset: 4, entity: this.config.entity_day5 },
-      this.config.entity_day6 && { offset: 5, entity: this.config.entity_day6 },
-      this.config.entity_day7 && { offset: 6, entity: this.config.entity_day7 },
-    ].filter(Boolean);
-
-    return html`
+import{LitElement as X,html as N,css as Y}from"lit";console.info("\uD83D\uDCE6 clock-pv-forecast-card v0.025 loaded");class Q extends X{static properties={hass:{},config:{}};constructor(){super();this._weekdayCache={},this._dateCache={}}setConfig(q){if(!q)throw new Error("Configuration is required");if(!["entity_today","entity_tomorrow","entity_day3","entity_day4","entity_day5","entity_day6","entity_day7"].some((I)=>q[I]))throw new Error("At least one forecast entity must be defined");let G=q.display_mode||"weekday",A;if(G==="date")A=q.day_column_width||"3.5em";else if(G==="relative")A=q.day_column_width||"2.5em";else{let I={narrow:"1.5em",short:"2.5em",long:"5em"},O=q.weekday_format||"short";A=I[O]||"2.5em"}this.config={animation_duration:q.animation_duration||"1s",bar_color_start:q.bar_color_start||"#3498db",bar_color_end:q.bar_color_end||"#2ecc71",remaining_color_start:q.remaining_color_start||"#999999",remaining_color_end:q.remaining_color_end||"#cccccc",remaining_threshold:q.remaining_threshold??null,remaining_low_color_start:q.remaining_low_color_start||"#e74c3c",remaining_low_color_end:q.remaining_low_color_end||"#e67e22",remaining_blink:q.remaining_blink||!1,max_value:q.max_value??100,weekday_format:q.weekday_format||"short",display_mode:G,date_format:q.date_format||"short",relative_plus_one:q.relative_plus_one||!1,day_column_width:A,entity_remaining:q.entity_remaining||null,remaining_label:q.remaining_label||"Rest",show_tooltips:q.show_tooltips??!1,...q},this._weekdayCache={},this._dateCache={}}shouldUpdate(q){if(q.has("config"))return!0;if(q.has("hass")){let D=q.get("hass");if(!D)return!0;return[this.config.entity_today,this.config.entity_tomorrow,this.config.entity_day3,this.config.entity_day4,this.config.entity_day5,this.config.entity_day6,this.config.entity_day7,this.config.entity_remaining].filter(Boolean).some((A)=>this.hass.states[A]?.state!==D.states[A]?.state||this.hass.states[A]?.last_updated!==D.states[A]?.last_updated)}return!1}render(){let q=[this.config.entity_today&&{offset:0,entity:this.config.entity_today},this.config.entity_tomorrow&&{offset:1,entity:this.config.entity_tomorrow},this.config.entity_day3&&{offset:2,entity:this.config.entity_day3},this.config.entity_day4&&{offset:3,entity:this.config.entity_day4},this.config.entity_day5&&{offset:4,entity:this.config.entity_day5},this.config.entity_day6&&{offset:5,entity:this.config.entity_day6},this.config.entity_day7&&{offset:6,entity:this.config.entity_day7}].filter(Boolean);return N`
       <ha-card>
         <div class="forecast-rows" role="table" aria-label="PV Forecast">
-          ${this.config.entity_remaining ? this._renderRemainingBar() : ''}
-          ${forecast.map((item, index) => this._renderForecastRow(item, index))}
+          ${this.config.entity_remaining?this._renderRemainingBar():""}
+          ${q.map((D,G)=>this._renderForecastRow(D,G))}
         </div>
       </ha-card>
-    `;
-  }
-
-  _renderForecastRow(item, index) {
-    const entityState = this.hass.states[item.entity];
-    
-    if (!entityState || entityState.state === 'unavailable' || entityState.state === 'unknown') {
-      return this._renderErrorRow(item, index, this.hass.localize('state.default.unavailable'));
-    }
-
-    const value = parseFloat(entityState.state ?? '0');
-    if (isNaN(value)) {
-      return this._renderErrorRow(item, index, this.hass.localize('ui.card.weather.unknown'));
-    }
-
-    const dayLabel = this._getDayLabel(item.offset);
-    const barStyle = `--bar-width: ${this._barWidth(value)}%; --bar-gradient: linear-gradient(to right, ${this.config.bar_color_start}, ${this.config.bar_color_end}); --animation-time: ${this.config.animation_duration}`;
-    
-    return html`
-      <div class="forecast-row" role="row" aria-label="Tag ${index + 1}">
-        <div class="day" role="cell" style="width: ${this.config.day_column_width}">${dayLabel}</div>
-        <div class="bar-container" role="cell" aria-label="Prognose ${this._formatValue(value, item.entity)}">
-          <div class="bar" style="${barStyle}" aria-hidden="true"></div>
-          ${this.config.show_tooltips ? this._renderTooltip(value, item.entity, dayLabel) : ''}
+    `}_renderForecastRow(q,D){let G=this.hass.states[q.entity];if(!G||G.state==="unavailable"||G.state==="unknown")return this._renderErrorRow(q,D,this.hass.localize("state.default.unavailable"));let A=parseFloat(G.state??"0");if(isNaN(A))return this._renderErrorRow(q,D,this.hass.localize("ui.card.weather.unknown"));let I=this._getDayLabel(q.offset),O=`--bar-width: ${this._barWidth(A)}%; --bar-gradient: linear-gradient(to right, ${this.config.bar_color_start}, ${this.config.bar_color_end}); --animation-time: ${this.config.animation_duration}`;return N`
+      <div class="forecast-row" role="row" aria-label="Tag ${D+1}">
+        <div class="day" role="cell" style="width: ${this.config.day_column_width}">${I}</div>
+        <div class="bar-container" role="cell" aria-label="Prognose ${this._formatValue(A,q.entity)}">
+          <div class="bar" style="${O}" aria-hidden="true"></div>
+          ${this.config.show_tooltips?this._renderTooltip(A,q.entity,I):""}
         </div>
-        <div class="value" role="cell">${this._formatValue(value, item.entity)}</div>
-      </div>`;
-  }
-
-  _renderErrorRow(item, index, errorMessage) {
-    const dayLabel = this._getDayLabel(item.offset);
-    return html`
-      <div class="forecast-row error" role="row" aria-label="Tag ${index + 1} - Fehler">
-        <div class="day" role="cell" style="width: ${this.config.day_column_width}">${dayLabel}</div>
+        <div class="value" role="cell">${this._formatValue(A,q.entity)}</div>
+      </div>`}_renderErrorRow(q,D,G){let A=this._getDayLabel(q.offset);return N`
+      <div class="forecast-row error" role="row" aria-label="Tag ${D+1} - Fehler">
+        <div class="day" role="cell" style="width: ${this.config.day_column_width}">${A}</div>
         <div class="bar-container error" role="cell">
-          <div class="error-text">${errorMessage}</div>
+          <div class="error-text">${G}</div>
         </div>
         <div class="value error" role="cell">-- kWh</div>
-      </div>`;
-  }
-
-  _renderRemainingBar() {
-    const entityState = this.hass.states[this.config.entity_remaining];
-    const remainingLabel = this.config.remaining_label;
-    
-    if (!entityState || entityState.state === 'unavailable' || entityState.state === 'unknown') {
-      return html`
+      </div>`}_renderRemainingBar(){let q=this.hass.states[this.config.entity_remaining],D=this.config.remaining_label;if(!q||q.state==="unavailable"||q.state==="unknown")return N`
         <div class="forecast-row error">
-          <div class="day" style="width: ${this.config.day_column_width}">${remainingLabel}</div>
+          <div class="day" style="width: ${this.config.day_column_width}">${D}</div>
           <div class="bar-container error">
-            <div class="error-text">${this.hass.localize('state.default.unavailable')}</div>
+            <div class="error-text">${this.hass.localize("state.default.unavailable")}</div>
           </div>
           <div class="value error">-- kWh</div>
-        </div>`;
-    }
-
-    const remaining = parseFloat(entityState.state ?? '0');
-    if (isNaN(remaining)) {
-      return html`
+        </div>`;let G=parseFloat(q.state??"0");if(isNaN(G))return N`
         <div class="forecast-row error">
-          <div class="day" style="width: ${this.config.day_column_width}">${remainingLabel}</div>
+          <div class="day" style="width: ${this.config.day_column_width}">${D}</div>
           <div class="bar-container error">
-            <div class="error-text">${this.hass.localize('ui.card.weather.unknown')}</div>
+            <div class="error-text">${this.hass.localize("ui.card.weather.unknown")}</div>
           </div>
           <div class="value error">-- kWh</div>
-        </div>`;
-    }
-
-    const belowThreshold = this.config.remaining_threshold !== null && remaining <= this.config.remaining_threshold;
-    const start = belowThreshold ? this.config.remaining_low_color_start : this.config.remaining_color_start;
-    const end = belowThreshold ? this.config.remaining_low_color_end : this.config.remaining_color_end;
-    const barStyle = `--bar-width: ${this._barWidth(remaining)}%; --bar-gradient: linear-gradient(to left, ${start}, ${end}); --animation-time: ${this.config.animation_duration}`;
-    const blinkClass = belowThreshold && this.config.remaining_blink ? 'blink' : '';
-    
-    return html`
+        </div>`;let A=this.config.remaining_threshold!==null&&G<=this.config.remaining_threshold,I=A?this.config.remaining_low_color_start:this.config.remaining_color_start,O=A?this.config.remaining_low_color_end:this.config.remaining_color_end,R=`--bar-width: ${this._barWidth(G)}%; --bar-gradient: linear-gradient(to left, ${I}, ${O}); --animation-time: ${this.config.animation_duration}`,V=A&&this.config.remaining_blink?"blink":"";return N`
       <div class="forecast-row">
-        <div class="day" style="width: ${this.config.day_column_width}">${remainingLabel}</div>
+        <div class="day" style="width: ${this.config.day_column_width}">${D}</div>
         <div class="bar-container rtl">
-          <div class="bar ${blinkClass}" style="${barStyle}"></div>
-          ${this.config.show_tooltips ? this._renderTooltip(remaining, this.config.entity_remaining, remainingLabel) : ''}
+          <div class="bar ${V}" style="${R}"></div>
+          ${this.config.show_tooltips?this._renderTooltip(G,this.config.entity_remaining,D):""}
         </div>
-        <div class="value">${this._formatValue(remaining, this.config.entity_remaining)}</div>
-      </div>`;
-  }
-
-  _renderTooltip(value, entity, dayLabel) {
-    const state = this.hass.states[entity];
-    const lastUpdated = state?.last_updated ? new Date(state.last_updated).toLocaleString() : this.hass.localize('state.default.unknown');
-    
-    return html`
+        <div class="value">${this._formatValue(G,this.config.entity_remaining)}</div>
+      </div>`}_renderTooltip(q,D,G){let A=this.hass.states[D],I=A?.last_updated?new Date(A.last_updated).toLocaleString():this.hass.localize("state.default.unknown");return N`
       <div class="tooltip">
         <div class="tooltip-content">
-          <strong>${dayLabel}</strong><br>
-          ${this.hass.localize('ui.card.energy.forecast') || 'Forecast'}: ${this._formatValue(value, entity)}<br>
-          <small>${this.hass.localize('ui.card.generic.last_updated') || 'Last updated'}: ${lastUpdated}</small>
+          <strong>${G}</strong><br>
+          ${this.hass.localize("ui.card.energy.forecast")||"Forecast"}: ${this._formatValue(q,D)}<br>
+          <small>${this.hass.localize("ui.card.generic.last_updated")||"Last updated"}: ${I}</small>
         </div>
       </div>
-    `;
-  }
-
-  _formatValue(value, entity) {
-    const state = this.hass.states[entity];
-    const unit = state?.attributes?.unit_of_measurement || 'kWh';
-    return `${value.toFixed(1)} ${unit}`;
-  }
-
-  _getDayLabel(offset) {
-    switch (this.config.display_mode) {
-      case 'date':
-        return this._getDateLabel(offset);
-      case 'relative':
-        return this._getRelativeLabel(offset);
-      default:
-        return this._getWeekdayName(offset);
-    }
-  }
-
-  _getWeekdayName(offset) {
-    const locale = this.hass.locale?.language || navigator.language || 'en';
-    const cacheKey = `weekday-${offset}-${locale}-${this.config.weekday_format}`;
-    
-    if (!this._weekdayCache[cacheKey]) {
-      const date = new Date();
-      date.setDate(date.getDate() + offset);
-      this._weekdayCache[cacheKey] = date.toLocaleDateString(locale, { 
-        weekday: this.config.weekday_format 
-      });
-    }
-    
-    return this._weekdayCache[cacheKey];
-  }
-
-  _getDateLabel(offset) {
-    const locale = this.hass.locale?.language || navigator.language || 'en';
-    const cacheKey = `date-${offset}-${locale}-${this.config.date_format}`;
-    
-    if (!this._dateCache[cacheKey]) {
-      const date = new Date();
-      date.setDate(date.getDate() + offset);
-      
-      if (this.config.date_format === 'numeric') {
-        // Numerisches Format: z.B. "12.6." oder "6/12" je nach Locale
-        this._dateCache[cacheKey] = date.toLocaleDateString(locale, { 
-          day: 'numeric',
-          month: 'numeric'
-        });
-      } else {
-        // Kurzes Format: z.B. "12.6." oder "Jun 12" je nach Locale
-        this._dateCache[cacheKey] = date.toLocaleDateString(locale, { 
-          day: 'numeric',
-          month: 'short'
-        });
-      }
-    }
-    
-    return this._dateCache[cacheKey];
-  }
-
-  _getRelativeLabel(offset) {
-    if (offset === 0) {
-      return this.hass.localize('ui.components.relative_time.today') || 'Today';
-    } else if (offset === 1) {
-      return this.config.relative_plus_one ? '+1d' : (this.hass.localize('ui.components.relative_time.tomorrow') || 'Tomorrow');
-    } else {
-      return `+${offset}d`;
-    }
-  }
-
-  _barWidth(value) {
-    const max = parseFloat(this.config.max_value || 100);
-    return Math.min((value / max) * 100, 100);
-  }
-
-  static getConfigElement() {
-    return document.createElement('clock-pv-forecast-card-editor');
-  }
-
-  static getStubConfig() {
-    return {
-      entity_today: 'sensor.pv_forecast_today',
-      entity_tomorrow: 'sensor.pv_forecast_tomorrow',
-      max_value: 100,
-      display_mode: 'weekday',
-      weekday_format: 'short',
-      date_format: 'short',
-      remaining_label: 'Rest',
-      relative_plus_one: false
-    };
-  }
-
-  static styles = css`
+    `}_formatValue(q,D){let A=this.hass.states[D]?.attributes?.unit_of_measurement||"kWh";return`${q.toFixed(1)} ${A}`}_getDayLabel(q){switch(this.config.display_mode){case"date":return this._getDateLabel(q);case"relative":return this._getRelativeLabel(q);default:return this._getWeekdayName(q)}}_getWeekdayName(q){let D=this.hass.locale?.language||navigator.language||"en",G=`weekday-${q}-${D}-${this.config.weekday_format}`;if(!this._weekdayCache[G]){let A=new Date;A.setDate(A.getDate()+q),this._weekdayCache[G]=A.toLocaleDateString(D,{weekday:this.config.weekday_format})}return this._weekdayCache[G]}_getDateLabel(q){let D=this.hass.locale?.language||navigator.language||"en",G=`date-${q}-${D}-${this.config.date_format}`;if(!this._dateCache[G]){let A=new Date;if(A.setDate(A.getDate()+q),this.config.date_format==="numeric")this._dateCache[G]=A.toLocaleDateString(D,{day:"numeric",month:"numeric"});else this._dateCache[G]=A.toLocaleDateString(D,{day:"numeric",month:"short"})}return this._dateCache[G]}_getRelativeLabel(q){if(q===0)return this.hass.localize("ui.components.relative_time.today")||"Today";else if(q===1)return this.config.relative_plus_one?"+1d":this.hass.localize("ui.components.relative_time.tomorrow")||"Tomorrow";else return`+${q}d`}_barWidth(q){let D=parseFloat(this.config.max_value||100);return Math.min(q/D*100,100)}static getConfigElement(){return document.createElement("clock-pv-forecast-card-editor")}static getStubConfig(){return{entity_today:"sensor.pv_forecast_today",entity_tomorrow:"sensor.pv_forecast_tomorrow",max_value:100,display_mode:"weekday",weekday_format:"short",date_format:"short",remaining_label:"Rest",relative_plus_one:!1}}static styles=Y`
     .forecast-rows {
       display: flex;
       flex-direction: column;
@@ -453,9 +193,4 @@ class ClockPvForecastCard extends LitElement {
         gap: 0.4em;
       }
     }
-  `;
-}
-
-if (!customElements.get('clock-pv-forecast-card')) {
-  customElements.define('clock-pv-forecast-card', ClockPvForecastCard);
-}
+  `}if(!customElements.get("clock-pv-forecast-card"))customElements.define("clock-pv-forecast-card",Q);

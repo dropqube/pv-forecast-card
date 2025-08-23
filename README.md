@@ -34,6 +34,8 @@ Heavily inspired by [Clock Weather Card](https://github.com/pkissling/clock-weat
    Resource type: JavaScript Module
    ```
 
+   The file bundles all dependencies (including Lit) and needs no external network requests.
+
 3. **Restart Home Assistant (recommended)**  
    Or reload your dashboard and clear your browser cache if needed.
 
@@ -70,6 +72,7 @@ Heavily inspired by [Clock Weather Card](https://github.com/pkissling/clock-weat
    URL: /local/clock_pv_forecast_card.js
    Ressourcentyp: JavaScript-Modul
    ```
+   Die Datei enthält alle Abhängigkeiten (inklusive Lit) und benötigt keine externen Netzwerkaufrufe.
 
 3. **Neustart empfohlen**  
    Starte Home Assistant neu oder lade das Dashboard neu (evtl. Cache löschen).
