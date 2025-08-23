@@ -1,7 +1,7 @@
 // pv-forecast-card
 import { LitElement, html, css } from 'lit';
 
-console.info("📦 clock-pv-forecast-card v0.025 loaded");
+console.info("📦 clock-pv-forecast-card v1.1.0 loaded");
 
 class ClockPvForecastCard extends LitElement {
   static properties = {

@@ -1,5 +1,6 @@
 {
   "name": "PV Forecast Card",
   "filename": "clock_pv_forecast_card.js",
-  "content_in_root": true
+  "content_in_root": true,
+  "render_readme": true
 }
