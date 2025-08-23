@@ -90,12 +90,12 @@ Heavily inspired by [Clock Weather Card](https://github.com/pkissling/clock-weat
 - 7-day PV forecast using your preferred integration - you can choose which days to display! (Today and tomorrow remain mandatory)
 - Animated bars with customizable colors
 - Responsive and localized layout
-- Optional remaining energy bar (with shrinking animation and alert color)
+- Optional remaining energy indicator (bar or marker) with shrinking animation and alert color in bar mode
 - **NEW**: Three display modes for day labels:
   - **Weekday mode**: Traditional weekday names (Mon, Tue, etc.)
   - **Date mode**: Short date format (12.6., Jun 12, etc.) - respects your system locale
   - **Relative mode**: Relative day indicators (Today, Tomorrow, +2d, +3d, etc.; optional +1d for tomorrow)
-- Customizable remaining bar label - change "Remaining" to your preferred text
+- Customizable remaining indicator label - change "Remaining" to your preferred text
 - Fully internationalized error messages using Home Assistant's localization system
 - Tooltips with detailed information and last update time
 
@@ -151,6 +151,7 @@ entity_day3: sensor.solcast_pv_forecast_prognose_tag_3
 type: custom:clock-pv-forecast-card
 display_mode: date
 date_format: numeric
+remaining_indicator: marker
 entity_remaining: sensor.solcast_pv_forecast_prognose_verbleibende_leistung_heute
 entity_today: sensor.solcast_pv_forecast_prognose_heute
 entity_tomorrow: sensor.solcast_pv_forecast_prognose_morgen
@@ -184,7 +185,8 @@ show_tooltips: true
 | `display_mode`                  | `string` | **NEW**: Display mode: `weekday`, `date`, or `relative` (default: `weekday`) |
 | `weekday_format`                | `string` | For weekday mode: `narrow`, `short`, or `long` (default: `short`) |
 | `date_format`                   | `string` | For date mode: `short` (12. Jun) or `numeric` (12.6.) (default: `short`) |
-| `remaining_label`               | `string` | Custom label for remaining bar (default: "Rest") |
+| `remaining_label`               | `string` | Custom label for remaining indicator (default: "Rest") |
+| `remaining_indicator`           | `string` | Display style for remaining value: `bar` (default) or `marker` |
 | `animation_duration`            | `string` | CSS time (e.g. `0.5s`, `2s`)                           |
 | `bar_color_start` / `end`       | `string` | Gradient colors for main bars                          |
 | `remaining_color_start` / `end` | `string` | Gradient colors for remaining bar                      |
@@ -235,7 +237,7 @@ The card now uses Home Assistant's built-in localization system for all error me
 - Use `vertical-stack` or `grid` layouts for better integration
 - Colors can use `var(--theme-color)` from your HA theme
 - Try [Google's color picker](https://www.google.com/search?q=hex+color+picker)
-- Customize the remaining bar label with `remaining_label` to match your use case (e.g., "Battery", "Available", "Remaining")
+- Customize the remaining indicator label with `remaining_label` to match your use case (e.g., "Battery", "Available", "Remaining")
 - Enable tooltips with `show_tooltips: true` for detailed information when hovering over bars
 - Column width automatically adjusts based on your chosen display mode
 - Date mode is perfect for weekly planning, relative mode for quick at-a-glance information (use `relative_plus_one` for "+1d" tomorrow)
@@ -249,12 +251,12 @@ The card now uses Home Assistant's built-in localization system for all error me
 - 7-Tage PV-Prognose mit wählbaren Tagen
 - Animierte Balken mit anpassbaren Farben
 - Responsive und lokalisierte Darstellung
-- Optionaler Verbrauchsbalken mit Warnfunktion
+- Optionaler Verbrauchsindikator (Balken oder Marker) mit Warnfunktion (Balkenmodus)
 - **NEU**: Drei Anzeigemodi für Tageslabels:
   - **Wochentag-Modus**: Traditionelle Wochentagsnamen (Mo, Di, etc.)
   - **Datums-Modus**: Kurzes Datumsformat (12.6., 12. Jun, etc.) - respektiert die Systemsprache
   - **Relativer Modus**: Relative Tagesangaben (Heute, Morgen, +2d, +3d, etc.; optional +1d für Morgen)
-- Anpassbares Label für Verbrauchsbalken
+- Anpassbares Label für Verbrauchsindikator
 - Vollständig internationalisierte Fehlermeldungen
 - Tooltips mit detaillierten Informationen
 
@@ -301,6 +303,7 @@ entity_day3: sensor.solcast_pv_forecast_prognose_tag_3
 type: custom:clock-pv-forecast-card
 display_mode: date
 date_format: numeric
+remaining_indicator: marker
 entity_remaining: sensor.solcast_pv_forecast_prognose_verbleibende_leistung_heute
 entity_today: sensor.solcast_pv_forecast_prognose_heute
 entity_tomorrow: sensor.solcast_pv_forecast_prognose_morgen
@@ -334,7 +337,8 @@ show_tooltips: true
 | `display_mode`                  | `string` | **NEU**: Anzeigemodus: `weekday`, `date`, oder `relative` (Standard: `weekday`) |
 | `weekday_format`                | `string` | Für Wochentag-Modus: `narrow`, `short`, oder `long` (Standard: `short`) |
 | `date_format`                   | `string` | Für Datums-Modus: `short` (12. Jun) oder `numeric` (12.6.) (Standard: `short`) |
-| `remaining_label`               | `string` | Angepasstes Label für Verbrauchsbalken (Standard: "Rest") |
+| `remaining_label`               | `string` | Angepasstes Label für Verbrauchsindikator (Standard: "Rest") |
+| `remaining_indicator`           | `string` | Anzeige des verbleibenden Werts: `bar` (Standard) oder `marker` |
 | `animation_duration`            | `string` | CSS-Zeit (z.B. `0.5s`, `2s`)                          |
 | `bar_color_start` / `end`       | `string` | Verlaufsfarben für Hauptbalken                        |
 | `remaining_color_start` / `end` | `string` | Verlaufsfarben für Verbrauchsbalken                   |
@@ -371,7 +375,7 @@ show_tooltips: true
 - Nutze `vertical-stack` oder `grid` Layouts für bessere Integration
 - Farben können `var(--theme-color)` aus deinem HA-Theme verwenden
 - Probiere [Google's Farbwähler](https://www.google.com/search?q=hex+color+picker) aus
-- Passe das Verbrauchsbalken-Label mit `remaining_label` an deinen Anwendungsfall an (z.B. "Batterie", "Verfügbar", "Rest")
+- Passe das Verbrauchsindikator-Label mit `remaining_label` an deinen Anwendungsfall an (z.B. "Batterie", "Verfügbar", "Rest")
 - Aktiviere Tooltips mit `show_tooltips: true` für detaillierte Informationen beim Hover über Balken
 - Die Spaltenbreite passt sich automatisch an den gewählten Anzeigemodus an
 - Datums-Modus ist perfekt für Wochenplanung, relativer Modus für schnelle Übersichtsinformationen (nutze `relative_plus_one` für "+1d" morgen)
