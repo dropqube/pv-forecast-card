@@ -1,7 +1,7 @@
 // pv-forecast-card
 import { LitElement, html, css } from 'https://unpkg.com/lit@2.8.0/index.js?module';
 
-console.info("📦 clock-pv-forecast-card v0.025 loaded");
+console.info("📦 clock-pv-forecast-card v0.028 loaded");
 
 class ClockPvForecastCard extends LitElement {
   static properties = {
@@ -64,7 +64,8 @@ class ClockPvForecastCard extends LitElement {
       day_column_width: dayColumnWidth,
       entity_remaining: config.entity_remaining || null,
       remaining_label: config.remaining_label || 'Rest',
-      remaining_indicator: config.remaining_indicator || 'bar',
+      remaining_indicator: config.remaining_indicator || 'bar', // 'bar' or 'marker'
+      marker_color: config.marker_color || '#2c3e50',
       show_tooltips: config.show_tooltips ?? false,
       ...config,
     };
@@ -140,11 +141,40 @@ class ClockPvForecastCard extends LitElement {
     const barStyle = `--bar-width: ${this._barWidth(value)}%; --bar-gradient: linear-gradient(to right, ${this.config.bar_color_start}, ${this.config.bar_color_end}); --animation-time: ${this.config.animation_duration}`;
 
     let remainingDot = '';
-    if (item.offset === 0 && this.config.remaining_indicator === 'marker' && this.config.entity_remaining) {
-      const remaining = parseFloat(this.hass.states[this.config.entity_remaining]?.state || '0');
-      const produced = value - remaining;
-      const percent = Math.max(0, Math.min(100, (produced / this.config.max_value) * 100));
-      remainingDot = html`<div class="remaining-dot" style="left: ${percent}%"></div>`;
+    let remainingText = '';
+    
+    if (item.offset === 0 && 
+        this.config.remaining_indicator === 'marker' && 
+        this.config.entity_remaining) {
+      
+      const remainingState = this.hass.states[this.config.entity_remaining];
+      
+      // Verbesserte Entity-Prüfung
+      if (remainingState && 
+          remainingState.state !== 'unavailable' && 
+          remainingState.state !== 'unknown' && 
+          remainingState.state !== null) {
+        
+        const remaining = parseFloat(remainingState.state);
+        
+        if (!isNaN(remaining) && remaining >= 0 && value > 0) {
+          // Korrekte Positionsberechnung
+          const consumed = Math.max(0, value - remaining);
+          const percent = Math.max(0, Math.min(100, (consumed / value) * this._barWidth(value) / 100));
+          
+          remainingDot = html`
+            <div class="remaining-dot" 
+                 style="left: ${percent}%; --marker-color: ${this.config.marker_color}"
+                 title="Verbraucht: ${consumed.toFixed(1)} kWh / Verbleibt: ${remaining.toFixed(1)} kWh"></div>`;
+          
+          // Text INNERHALB des Balkens
+          remainingText = html`
+            <div class="remaining-text-inside" 
+                 style="--marker-color: ${this.config.marker_color}">
+              ${this._formatValue(remaining, this.config.entity_remaining)}
+            </div>`;
+        }
+      }
     }
 
     return html`
@@ -153,9 +183,12 @@ class ClockPvForecastCard extends LitElement {
         <div class="bar-container" role="cell" aria-label="Prognose ${this._formatValue(value, item.entity)}">
           <div class="bar" style="${barStyle}" aria-hidden="true"></div>
           ${remainingDot}
+          ${remainingText}
           ${this.config.show_tooltips ? this._renderTooltip(value, item.entity, dayLabel) : ''}
         </div>
-        <div class="value" role="cell">${this._formatValue(value, item.entity)}</div>
+        <div class="value" role="cell">
+          ${this._formatValue(value, item.entity)}
+        </div>
       </div>`;
   }
 
@@ -223,8 +256,8 @@ class ClockPvForecastCard extends LitElement {
       <div class="tooltip">
         <div class="tooltip-content">
           <strong>${dayLabel}</strong><br>
-          ${this.hass.localize('ui.card.energy.forecast') || 'Forecast'}: ${this._formatValue(value, entity)}<br>
-          <small>${this.hass.localize('ui.card.generic.last_updated') || 'Last updated'}: ${lastUpdated}</small>
+          ${this.hass.localize('ui.card.energy.forecast') || 'Prognose'}: ${this._formatValue(value, entity)}<br>
+          <small>${this.hass.localize('ui.card.generic.last_updated') || 'Zuletzt aktualisiert'}: ${lastUpdated}</small>
         </div>
       </div>
     `;
@@ -290,9 +323,9 @@ class ClockPvForecastCard extends LitElement {
 
   _getRelativeLabel(offset) {
     if (offset === 0) {
-      return this.hass.localize('ui.components.relative_time.today') || 'Today';
+      return this.hass.localize('ui.components.relative_time.today') || 'Heute';
     } else if (offset === 1) {
-      return this.config.relative_plus_one ? '+1d' : (this.hass.localize('ui.components.relative_time.tomorrow') || 'Tomorrow');
+      return this.config.relative_plus_one ? '+1d' : (this.hass.localize('ui.components.relative_time.tomorrow') || 'Morgen');
     } else {
       return `+${offset}d`;
     }
@@ -311,11 +344,14 @@ class ClockPvForecastCard extends LitElement {
     return {
       entity_today: 'sensor.pv_forecast_today',
       entity_tomorrow: 'sensor.pv_forecast_tomorrow',
+      entity_remaining: 'sensor.pv_remaining_today',
       max_value: 100,
       display_mode: 'weekday',
       weekday_format: 'short',
       date_format: 'short',
       remaining_label: 'Rest',
+      remaining_indicator: 'bar', // oder 'marker'
+      marker_color: '#2c3e50',
       relative_plus_one: false
     };
   }
@@ -380,10 +416,28 @@ class ClockPvForecastCard extends LitElement {
       position: absolute;
       top: 50%;
       transform: translate(-50%, -50%);
-      width: 8px;
-      height: 8px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
-      background: var(--primary-color);
+      background: var(--marker-color, #2c3e50);
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      z-index: 10;
+      cursor: help;
+    }
+
+    .remaining-text-inside {
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      transform: translateY(-50%);
+      color: white;
+      font-size: 0.7em;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+      z-index: 5;
+      pointer-events: none;
+      white-space: nowrap;
     }
 
     .value {
@@ -448,6 +502,17 @@ class ClockPvForecastCard extends LitElement {
         padding: 0.5em;
       }
       
+      .remaining-dot {
+        width: 8px;
+        height: 8px;
+        border-width: 1px;
+      }
+      
+      .remaining-text-inside {
+        font-size: 0.6em;
+        right: 6px;
+      }
+      
       .value {
         font-size: 0.75em;
         width: 3.5em;
@@ -471,6 +536,17 @@ class ClockPvForecastCard extends LitElement {
       
       .forecast-row {
         gap: 0.4em;
+      }
+      
+      .remaining-dot {
+        width: 6px;
+        height: 6px;
+        border-width: 1px;
+      }
+      
+      .remaining-text-inside {
+        font-size: 0.55em;
+        right: 4px;
       }
     }
   `;
