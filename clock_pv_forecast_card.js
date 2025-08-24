@@ -1,7 +1,7 @@
 // pv-forecast-card
 import { LitElement, html, css } from 'https://unpkg.com/lit@2.8.0/index.js?module';
 
-console.info("📦 clock-pv-forecast-card v0.028 loaded");
+console.info("📦 clock-pv-forecast-card v1.1.4 loaded");
 
 class ClockPvForecastCard extends LitElement {
   static properties = {
@@ -158,13 +158,15 @@ class ClockPvForecastCard extends LitElement {
         const remaining = parseFloat(remainingState.state);
         
         if (!isNaN(remaining) && remaining >= 0 && value > 0) {
-          // Korrekte Positionsberechnung
+          // KORRIGIERTE Positionsberechnung:
           const consumed = Math.max(0, value - remaining);
-          const percent = Math.max(0, Math.min(100, (consumed / value) * this._barWidth(value) / 100));
+          const consumedRatio = consumed / value; // Anteil des verbrauchten Werts
+          const totalBarWidth = this._barWidth(value); // Tatsächliche Balkenbreite in %
+          const markerPosition = consumedRatio * totalBarWidth; // Position auf dem sichtbaren Balken
           
           remainingDot = html`
             <div class="remaining-dot" 
-                 style="left: ${percent}%; --marker-color: ${this.config.marker_color}"
+                 style="left: ${markerPosition}%; --marker-color: ${this.config.marker_color}"
                  title="Verbraucht: ${consumed.toFixed(1)} kWh / Verbleibt: ${remaining.toFixed(1)} kWh"></div>`;
           
           // Text INNERHALB des Balkens
