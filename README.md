@@ -190,6 +190,7 @@ show_tooltips: true
 | `animation_duration`            | `string` | CSS time (e.g. `0.5s`, `2s`)                           |
 | `bar_color_start` / `end`       | `string` | Gradient colors for main bars                          |
 | `remaining_color_start` / `end` | `string` | Gradient colors for remaining bar                      |
+| `gradient_fixed`                | `string` | Set to 'true' if you want the gradient fixed           |
 | `remaining_threshold`           | `number` | If remaining ≤ this, use `low_color_*`                 |
 | `remaining_low_color_start`     | `string` | Alert gradient (start)                                 |
 | `remaining_low_color_end`       | `string` | Alert gradient (end)                                   |
@@ -197,6 +198,7 @@ show_tooltips: true
 | `max_value`                     | `number` | Maximum value to normalize bar width                   |
 | `show_tooltips`                 | `boolean`| Show tooltip when hovering the bar                    |
 | `relative_plus_one`             | `boolean`| In relative mode show "+1d" instead of "Tomorrow" (default: `false`) |
+
 
 #### Display Mode Options Explained
 
