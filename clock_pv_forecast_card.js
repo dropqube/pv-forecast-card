@@ -1,7 +1,7 @@
 // pv-forecast-card
 import { LitElement, html, css } from 'https://unpkg.com/lit@2.8.0/index.js?module';
 
-console.info("📦 clock-pv-forecast-card v1.1.4 loaded");
+console.info("📦 clock-pv-forecast-card v1.1.5 loaded");
 
 class ClockPvForecastCard extends LitElement {
   static properties = {
@@ -66,6 +66,7 @@ class ClockPvForecastCard extends LitElement {
       remaining_label: config.remaining_label || 'Rest',
       remaining_indicator: config.remaining_indicator || 'bar', // 'bar' or 'marker'
       marker_color: config.marker_color || '#2c3e50',
+      gradient_fixed: config.gradient_fixed ?? false, // NEUE OPTION
       show_tooltips: config.show_tooltips ?? false,
       ...config,
     };
@@ -149,7 +150,6 @@ class ClockPvForecastCard extends LitElement {
       
       const remainingState = this.hass.states[this.config.entity_remaining];
       
-      // Verbesserte Entity-Prüfung
       if (remainingState && 
           remainingState.state !== 'unavailable' && 
           remainingState.state !== 'unknown' && 
@@ -158,18 +158,16 @@ class ClockPvForecastCard extends LitElement {
         const remaining = parseFloat(remainingState.state);
         
         if (!isNaN(remaining) && remaining >= 0 && value > 0) {
-          // KORRIGIERTE Positionsberechnung:
           const consumed = Math.max(0, value - remaining);
-          const consumedRatio = consumed / value; // Anteil des verbrauchten Werts
-          const totalBarWidth = this._barWidth(value); // Tatsächliche Balkenbreite in %
-          const markerPosition = consumedRatio * totalBarWidth; // Position auf dem sichtbaren Balken
+          const consumedRatio = consumed / value;
+          const totalBarWidth = this._barWidth(value);
+          const markerPosition = consumedRatio * totalBarWidth;
           
           remainingDot = html`
             <div class="remaining-dot" 
                  style="left: ${markerPosition}%; --marker-color: ${this.config.marker_color}"
                  title="Verbraucht: ${consumed.toFixed(1)} kWh / Verbleibt: ${remaining.toFixed(1)} kWh"></div>`;
           
-          // Text INNERHALB des Balkens
           remainingText = html`
             <div class="remaining-text-inside" 
                  style="--marker-color: ${this.config.marker_color}">
@@ -182,7 +180,7 @@ class ClockPvForecastCard extends LitElement {
     return html`
       <div class="forecast-row" role="row" aria-label="Tag ${index + 1}">
         <div class="day" role="cell" style="width: ${this.config.day_column_width}">${dayLabel}</div>
-        <div class="bar-container" role="cell" aria-label="Prognose ${this._formatValue(value, item.entity)}">
+        <div class="bar-container ${this.config.gradient_fixed ? 'fixed-gradient' : ''}" role="cell" aria-label="Prognose ${this._formatValue(value, item.entity)}">
           <div class="bar" style="${barStyle}" aria-hidden="true"></div>
           ${remainingDot}
           ${remainingText}
@@ -242,7 +240,7 @@ class ClockPvForecastCard extends LitElement {
     return html`
       <div class="forecast-row">
         <div class="day" style="width: ${this.config.day_column_width}">${remainingLabel}</div>
-        <div class="bar-container rtl">
+        <div class="bar-container rtl ${this.config.gradient_fixed ? 'fixed-gradient' : ''}">
           <div class="bar ${blinkClass}" style="${barStyle}"></div>
           ${this.config.show_tooltips ? this._renderTooltip(remaining, this.config.entity_remaining, remainingLabel) : ''}
         </div>
@@ -354,6 +352,7 @@ class ClockPvForecastCard extends LitElement {
       remaining_label: 'Rest',
       remaining_indicator: 'bar', // oder 'marker'
       marker_color: '#2c3e50',
+      gradient_fixed: false, // NEUE OPTION
       relative_plus_one: false
     };
   }
@@ -389,6 +388,7 @@ class ClockPvForecastCard extends LitElement {
       border-radius: 7px;
       overflow: visible;
       position: relative;
+      container-type: inline-size; /* NEUE ZEILE für Container Queries */
     }
     
     .bar-container.rtl {
@@ -408,6 +408,10 @@ class ClockPvForecastCard extends LitElement {
       width: 0%;
       background: var(--bar-gradient);
       animation: fill-bar var(--animation-time) ease-out forwards;
+    }
+    
+    .bar-container.fixed-gradient .bar {
+      background-size: 100cqi; /* Container Query Inline Size */
     }
     
     .bar.blink {
