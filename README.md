@@ -1,8 +1,7 @@
-Hier ist der vollständige Inhalt für die `README.md` als ein einziger, kopierfähiger Markdown-Codeblock:
-
-```markdown
 ## 🔆 pv-forecast-card
 A compact and elegant **solar forecast card** for Home Assistant, displaying seven days of PV yield predictions as **animated progress bars**, with **localized weekday labels** and customizable styling.
+
+**Now with full Visual Editor support!** 🎨
 
 Heavily inspired by [Clock Weather Card](https://github.com/pkissling/clock-weather-card)
 
@@ -10,57 +9,39 @@ Heavily inspired by [Clock Weather Card](https://github.com/pkissling/clock-weat
 
 ---
 
-**For 🇩🇪 GERMAN README scroll down** **Installation instructions (manual) are at the top**
+**For 🇩🇪 GERMAN README scroll down**
 
 ---
 
-### 🇬🇧 MANUAL Installation of `clock-pv-forecast-card` in Home Assistant
+### 🇬🇧 Installation
+1. **Download** the `clock_pv_forecast_card.js` file and save it to `/config/www/`.
+2. **Register** the resource in `Settings → Dashboards → ⋮ → Resources`:
+   * URL: `/local/clock_pv_forecast_card.js`
+   * Type: `JavaScript Module`
+3. **Add Card:** Go to your dashboard, click "Edit", "Add Card", and select **Custom: Clock PV Forecast Card**.
 
-1. **Place the JavaScript file** Download or create the file `clock_pv_forecast_card.js` and save it to:
-
-```
-
-/config/www/
-
-```
-
-2. **Register the resource** Go to: `Settings → Dashboards → ⋮ (three dots) → Resources`  
-Add a new JavaScript module:
-
-```
-
-URL: /local/clock_pv_forecast_card.js
-Resource type: JavaScript Module
-
-```
-
-3. **Add the card to a dashboard (YAML)**
-```yaml
-type: custom:clock-pv-forecast-card
-entity_today: sensor.energy_production_today
-
-```
-
----
-
-### ⚙️ Configuration Options (English)
+### ⚙️ Configuration
+You can configure almost everything via the **Visual Editor**. For advanced setups (like color thresholds), you can use YAML.
 
 | Option | Type | Default | Description |
-| --- | --- | --- | --- |
+|:-----|:-----|:--------|:------------|
 | `entity_today` | string | **Required** | Sensor for today's forecast. |
 | `entity_tomorrow` | string | Optional | Sensor for tomorrow's forecast. |
 | `entity_day3` to `day7` | string | Optional | Sensors for the following days. |
 | `entity_remaining` | string | Optional | Sensor for remaining energy today. |
-| `bar_style` | string | `gradient` | **New:** `gradient` (default) or `solid` (threshold-based colors). |
-| `color_thresholds` | list | (default) | **New:** Define custom thresholds for `solid` mode. |
-| `gradient_fixed` | boolean | `false` | **New:** If `true`, the gradient is fixed to full width (0-100%). |
-| `remaining_indicator` | string | `bar` | **New:** `bar` for a separate row, `marker` for a dot inside today's bar. |
-| `max_value` | number | `100` | Maximum value for 100% bar width. |
+| `max_value` | number | `100` | Value (kWh) representing 100% bar width. |
 | `display_mode` | string | `weekday` | `weekday`, `date`, or `relative`. |
-| `show_tooltips` | boolean | `false` | Shows detailed info and "last updated" on hover. |
+| `weekday_format` | string | `short` | `short` (Mon), `long` (Monday), `narrow` (M). |
+| `bar_style` | string | `gradient` | `gradient` (default) or `solid` (threshold colors). |
+| `color_thresholds` | list | (default) | **YAML only:** Define colors for `solid` mode. |
+| `gradient_fixed` | boolean | `false` | If `true`, the gradient spans 0-100% fixed width. |
+| `remaining_indicator`| string | `bar` | `bar` (separate row) or `marker` (dot inside today's bar). |
+| `remaining_inverted` | boolean | `false` | If `true`, marker counts down (Right-to-Left). |
+| `show_tooltips` | boolean | `false` | Shows details and "last updated" on hover. |
+| `bar_color_start` | string | `#3498db` | Start color of the gradient (Hex). |
+| `bar_color_end` | string | `#2ecc71` | End color of the gradient (Hex). |
 
-#### Example: Threshold-based Colors (Solid Mode)
-
+#### Example: Solid Colors (Thresholds) - YAML Mode
 ```yaml
 type: custom:clock-pv-forecast-card
 entity_today: sensor.energy_production_today
@@ -77,48 +58,47 @@ color_thresholds:
 
 ---
 
-## 🇩🇪 Installation (Manuell)
+## 🇩🇪 Installation & Konfiguration
 
-1. **Datei speichern**: `clock_pv_forecast_card.js` nach `/config/www/` kopieren.
-2. **Ressource registrieren**: Unter `Einstellungen → Dashboards → Ressourcen` die URL `/local/clock_pv_forecast_card.js` als JavaScript-Modul hinzufügen.
-3. **Karte hinzufügen**: Im Dashboard via YAML mit `type: custom:clock-pv-forecast-card`.
+### Installation (Manuell)
 
-### ⚙️ Konfigurations-Optionen (Deutsch)
+1. **Datei speichern**: Lade `clock_pv_forecast_card.js` herunter und speichere sie unter `/config/www/`.
+2. **Ressource registrieren**: Gehe zu `Einstellungen → Dashboards → Ressourcen` und füge hinzu:
+* URL: `/local/clock_pv_forecast_card.js`
+* Typ: `JavaScript Modul`
+
+
+3. **Karte hinzufügen**: Im Dashboard "Karte hinzufügen" klicken und **Custom: Clock PV Forecast Card** wählen.
+
+### ⚙️ Konfiguration
+
+Die Karte verfügt nun über einen **Visuellen Editor**. Die meisten Einstellungen können bequem per Klick vorgenommen werden.
 
 | Option | Typ | Standard | Beschreibung |
 | --- | --- | --- | --- |
-| `entity_today` | string | **Erforderlich** | Sensor für die heutige Prognose. |
-| `bar_style` | string | `gradient` | **Neu:** `gradient` (Verlauf) oder `solid` (feste Farben nach Grenzwerten). |
-| `color_thresholds` | Liste | (Standard) | **Neu:** Eigene Grenzwerte für den `solid` Modus definieren. |
-| `gradient_fixed` | boolean | `false` | **Neu:** Fixiert den Farbverlauf auf 0-100% Breite. |
-| `remaining_indicator` | string | `bar` | **Neu:** `bar` (eigene Zeile), `marker` (Punkt im Balken von heute). |
-| `max_value` | Zahl | `100` | Maximalwert für 100% Balkenbreite. |
-| `display_mode` | string | `weekday` | `weekday` (Wochentag), `date` (Datum), `relative` (Heute/Morgen). |
-| `show_tooltips` | boolean | `false` | Zeigt Details und Zeitstempel beim Drüberfahren (Hover). |
+| `entity_today` | string | **Pflicht** | Sensor für die heutige Prognose. |
+| `max_value` | Zahl | `100` | Maximalwert für 100% Balkenbreite (kWh). |
+| `display_mode` | string | `weekday` | `weekday` (Mo), `date` (12.6.), `relative` (Heute). |
+| `bar_style` | string | `gradient` | `gradient` (Verlauf) oder `solid` (Feste Farben). |
+| `color_thresholds` | Liste | (Standard) | **Nur YAML:** Grenzwerte für `solid` Farben. |
+| `remaining_indicator` | string | `bar` | `bar` (eigene Zeile) oder `marker` (Punkt im Balken). |
+| `remaining_inverted` | boolean | `false` | `true` = Countdown-Modus (Rechts nach Links). |
+| `show_tooltips` | boolean | `false` | Zeigt Details beim Drüberfahren (Mouseover). |
+| `bar_color_start` | string | `#3498db` | Startfarbe (Hex-Code). |
+| `bar_color_end` | string | `#2ecc71` | Endfarbe (Hex-Code). |
 
-#### Beispiel: Feste Farben statt Verlauf
+#### Beispiel: Countdown-Marker (Visuell einstellbar)
+
+Nutze diese Einstellung, um den verbleibenden Ertrag als "Countdown" im heutigen Balken anzuzeigen.
 
 ```yaml
 type: custom:clock-pv-forecast-card
-entity_today: sensor.energy_production_today
-bar_style: solid
-color_thresholds:
-  - value: 20
-    color: "green"
-  - value: 10
-    color: "orange"
-  - value: 0
-    color: "red"
+entity_today: sensor.pv_forecast_today
+entity_remaining: sensor.pv_remaining
+remaining_indicator: marker
+remaining_inverted: true
 
 ```
-
-### 💡 Features & Tipps
-
-* **HA 2025 Ready:** Vollständig optimiert für das neue Sections-Dashboard und moderne Container-Queries.
-* **Lokalisierung:** Automatische Erkennung der Sprache (DE, EN, FR, ES, IT, NL) und korrekte Zahlenformate (Komma vs. Punkt).
-* **Offline-Betrieb:** Keine Abhängigkeit von externen Servern (unpkg), lädt direkt aus dem Home Assistant Core.
-* **Tooltips:** Aktiviere `show_tooltips: true` für detaillierte Informationen beim Hover.
-* **Rest-Anzeige:** Nutze `remaining_indicator: marker`, um den verbleibenden Tagesertrag als Punkt im heutigen Balken anzuzeigen.
 
 ---
 
