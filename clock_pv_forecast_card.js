@@ -1,11 +1,11 @@
 // clock_pv_forecast_card.js
 
-// V1.4.0 - Fix Z-Index Overlay Issue
+// V1.5.1 - Fix CSS Variable Syntax Error
 const LitElement = Object.getPrototypeOf(customElements.get("ha-panel-lovelace"));
 const html = LitElement.prototype.html;
 const css = LitElement.prototype.css;
 
-console.info("📦 clock-pv-forecast-card v1.4.0 loaded (z-index fix)");
+console.info("📦 clock-pv-forecast-card v1.5.1 loaded (CSS Fix)");
 
 const translations = {
   en: { forecast: "Forecast", remaining: "Remaining", last_updated: "Last updated", today: "Today", tomorrow: "Tomorrow", error_config: "Configuration Error", error_entity: "At least one forecast entity must be defined", unavailable: "Unavailable", unknown: "Unknown" },
@@ -47,10 +47,18 @@ class ClockPvForecastCard extends LitElement {
       dayColumnWidth = weekdayWidth[config.weekday_format || 'short'] || '2.5em';
     }
 
+    const defaultThresholds = [
+        { value: 0, color: '#e74c3c' },
+        { value: 10, color: '#f1c40f' },
+        { value: 20, color: '#2ecc71' }
+    ];
+
     this.config = {
       animation_duration: '1s',
       bar_color_start: '#3498db',
       bar_color_end: '#2ecc71',
+      bar_style: 'gradient', 
+      color_thresholds: defaultThresholds,
       remaining_color_start: '#999999',
       remaining_color_end: '#cccccc',
       remaining_threshold: null,
@@ -121,6 +129,18 @@ class ClockPvForecastCard extends LitElement {
     `;
   }
 
+  _getThresholdColor(value) {
+    const thresholds = this.config.color_thresholds || [];
+    const sorted = [...thresholds].sort((a, b) => b.value - a.value);
+    
+    for (const t of sorted) {
+      if (value >= t.value) {
+        return t.color;
+      }
+    }
+    return thresholds.length > 0 ? thresholds[thresholds.length - 1].color : this.config.bar_color_start;
+  }
+
   _renderForecastRow(item, index) {
     const entityState = this.hass.states[item.entity];
     if (!entityState || ['unavailable', 'unknown'].includes(entityState.state)) {
@@ -130,7 +150,16 @@ class ClockPvForecastCard extends LitElement {
     if (isNaN(value)) return this._renderErrorRow(item, index, this._localize('unknown'));
 
     const dayLabel = this._getDayLabel(item.offset);
-    const barStyle = `--bar-width: ${this._barWidth(value)}%; --bar-gradient: linear-gradient(to right, ${this.config.bar_color_start}, ${this.config.bar_color_end}); --animation-time: ${this.config.animation_duration}`;
+
+    // FIX: Nur den WERT (Farbe oder Gradient) in die Variable schreiben, nicht "background: ..."
+    let backgroundValue;
+    if (this.config.bar_style === 'solid') {
+        backgroundValue = this._getThresholdColor(value);
+    } else {
+        backgroundValue = `linear-gradient(to right, ${this.config.bar_color_start}, ${this.config.bar_color_end})`;
+    }
+
+    const barStyle = `--bar-width: ${this._barWidth(value)}%; --bar-bg: ${backgroundValue}; --animation-time: ${this.config.animation_duration}`;
 
     let remainingDot = '';
     let remainingText = '';
@@ -175,7 +204,9 @@ class ClockPvForecastCard extends LitElement {
     const belowThreshold = this.config.remaining_threshold !== null && remaining <= this.config.remaining_threshold;
     const start = belowThreshold ? this.config.remaining_low_color_start : this.config.remaining_color_start;
     const end = belowThreshold ? this.config.remaining_low_color_end : this.config.remaining_color_end;
-    const barStyle = `--bar-width: ${this._barWidth(remaining)}%; --bar-gradient: linear-gradient(to left, ${start}, ${end}); --animation-time: ${this.config.animation_duration}`;
+    
+    // Für Rest-Bar lassen wir den Verlauf
+    const barStyle = `--bar-width: ${this._barWidth(remaining)}%; --bar-bg: linear-gradient(to left, ${start}, ${end}); --animation-time: ${this.config.animation_duration}`;
     const blinkClass = belowThreshold && this.config.remaining_blink ? 'blink' : '';
 
     return html`<div class="forecast-row"><div class="day" style="width: ${this.config.day_column_width}">${remainingLabel}</div><div class="bar-container rtl ${this.config.gradient_fixed ? 'fixed-gradient' : ''}"><div class="bar ${blinkClass}" style="${barStyle}"></div>${this.config.show_tooltips ? this._renderTooltip(remaining, this.config.entity_remaining, remainingLabel) : ''}</div><div class="value">${this._formatValue(remaining, this.config.entity_remaining)}</div></div>`;
@@ -234,7 +265,7 @@ class ClockPvForecastCard extends LitElement {
   static styles = css`
     .forecast-rows { 
       display: flex; flex-direction: column; gap: 0.4em; padding: 1em; 
-      isolation: isolate; /* FIX: Erstellt neuen Stacking Context */
+      isolation: isolate; 
     }
     .forecast-row { display: flex; align-items: center; gap: 0.8em; }
     .forecast-row.error { opacity: 0.6; }
@@ -242,13 +273,14 @@ class ClockPvForecastCard extends LitElement {
     
     .bar-container { 
       flex-grow: 1; height: 14px; background: var(--divider-color, #eee); border-radius: 7px; 
-      overflow: visible; /* Muss visible sein für Tooltips, aber wir kontrollieren jetzt z-index */
+      overflow: visible; 
       position: relative; container-type: inline-size; 
     }
     
     .bar-container.rtl { direction: rtl; }
     .bar-container.error { display: flex; align-items: center; justify-content: center; overflow: hidden; }
-    .bar { height: 100%; border-radius: 7px; width: 0%; background: var(--bar-gradient); animation: fill-bar var(--animation-time) ease-out forwards; }
+    
+    .bar { height: 100%; border-radius: 7px; width: 0%; background: var(--bar-bg); animation: fill-bar var(--animation-time) ease-out forwards; }
     .bar-container.fixed-gradient .bar { background-size: 100cqi; }
     .bar.blink { animation: fill-bar var(--animation-time) ease-out forwards, blink 1s infinite; }
     
@@ -257,7 +289,7 @@ class ClockPvForecastCard extends LitElement {
       width: 10px; height: 10px; border-radius: 50%; 
       background: var(--marker-color, #2c3e50); border: 2px solid white; 
       box-shadow: 0 2px 4px rgba(0,0,0,0.3); 
-      z-index: 2; /* FIX: Reduziert von 10 auf 2 */
+      z-index: 2; 
       cursor: help; 
     }
     
@@ -265,7 +297,7 @@ class ClockPvForecastCard extends LitElement {
       position: absolute; top: 50%; right: 8px; transform: translateY(-50%); 
       color: white; font-size: 0.7em; font-weight: bold; 
       text-shadow: 1px 1px 2px rgba(0,0,0,0.8); 
-      z-index: 3; /* FIX: Reduziert, knapp über Dot */
+      z-index: 3; 
       pointer-events: none; white-space: nowrap; 
     }
     
@@ -279,7 +311,7 @@ class ClockPvForecastCard extends LitElement {
       border: 1px solid var(--divider-color, #eee); border-radius: 4px; 
       padding: 8px; font-size: 0.8em; box-shadow: 0 2px 8px rgba(0,0,0,0.15); 
       opacity: 0; pointer-events: none; transition: opacity 0.2s; 
-      z-index: 20; /* FIX: Reduziert von 1000 auf 20 */
+      z-index: 20; 
       white-space: nowrap; color: var(--primary-text-color); 
     }
     
