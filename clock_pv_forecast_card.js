@@ -325,7 +325,41 @@ class ClockPvForecastCard extends LitElement {
     return `+${offset}d`;
   }
 
-  _barWidth(val) { return Math.min((val / parseFloat(this.config.max_value || 100)) * 100, 100); }
+	_getForecastMaxValue() {
+	  if (!this.hass || !this.config) return this.config.max_value || 100;
+
+	  const entities = [
+		this.config.entity_today,
+		this.config.entity_tomorrow,
+		this.config.entity_day3,
+		this.config.entity_day4,
+		this.config.entity_day5,
+		this.config.entity_day6,
+		this.config.entity_day7,
+	  ].filter(Boolean);
+
+	  const values = entities
+		.map(e => parseFloat(this.hass.states[e]?.state))
+		.filter(v => !isNaN(v));
+
+	  if (values.length === 0) {
+		return this.config.max_value || 100;
+	  }
+
+	  const rawMax = Math.max(...values);
+	  return this._roundUp5(rawMax);
+	}
+	
+	_roundUp5(value) {
+		if (value <= 0) return 5;  // fallback
+		return Math.ceil(value / 5) * 5;
+	}
+
+	_barWidth(val) {
+	  const max = this._getForecastMaxValue();
+	  return Math.min((val / max) * 100, 100);
+	}
+
 
   static styles = css`
     .forecast-rows { display: flex; flex-direction: column; gap: 0.4em; padding: 1em; isolation: isolate; }
