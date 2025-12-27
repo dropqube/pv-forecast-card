@@ -14,6 +14,10 @@ Heavily inspired by [Clock Weather Card](https://github.com/pkissling/clock-weat
 ---
 
 ### 🇬🇧 Installation
+
+**I HEAVILY RECOMMEND INSTALLING THIS ViA HACS**
+
+
 1. **Download** the `clock_pv_forecast_card.js` file and save it to `/config/www/`.
 2. **Register** the resource in `Settings → Dashboards → ⋮ → Resources`:
    * URL: `/local/clock_pv_forecast_card.js`
@@ -59,6 +63,8 @@ color_thresholds:
 ---
 
 ## 🇩🇪 Installation & Konfiguration
+
+**ICH EMPFEHLE DIE INSTALLATION ÜBER HACS**
 
 ### Installation (Manuell)
 
