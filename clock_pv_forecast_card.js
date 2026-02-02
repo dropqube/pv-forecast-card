@@ -1,6 +1,6 @@
 // clock_pv_forecast_card.js
 
-// V1.8.1 - Extended Editor with Colors & Advanced Options
+// V1.8.5 - Fixes
 const LitElement = Object.getPrototypeOf(customElements.get("ha-panel-lovelace"));
 const html = LitElement.prototype.html;
 const css = LitElement.prototype.css;
@@ -343,6 +343,11 @@ class ClockPvForecastCard extends LitElement {
 		this.config.entity_day6,
 		this.config.entity_day7,
 		this.config.entity_day8,
+		this.config.entity_day9,
+        this.config.entity_day10,
+        this.config.entity_day11,
+        this.config.entity_day12,
+        this.config.entity_day13,
 	  ].filter(Boolean);
 
 	  const values = entities
@@ -350,7 +355,7 @@ class ClockPvForecastCard extends LitElement {
 		.filter(v => !isNaN(v));
 
 	  if (values.length === 0) {
-		return this.config.max_value || 100;
+		return 100;
 	  }
 
 	  const rawMax = Math.max(...values);
