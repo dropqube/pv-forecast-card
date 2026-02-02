@@ -109,6 +109,6 @@ remaining_inverted: true
 
 ---
 
-**License:** MIT
+**License:** GPL-3.0
 
 **Inspiration:** [Clock Weather Card](https://github.com/pkissling/clock-weather-card)
