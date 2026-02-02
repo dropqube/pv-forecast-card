@@ -130,6 +130,7 @@ class ClockPvForecastCard extends LitElement {
       this.config.entity_day5 && { offset: 4, entity: this.config.entity_day5 },
       this.config.entity_day6 && { offset: 5, entity: this.config.entity_day6 },
       this.config.entity_day7 && { offset: 6, entity: this.config.entity_day7 },
+	  this.config.entity_day8 && { offset: 7, entity: this.config.entity_day8 },
       this.config.entity_day9 && { offset: 8, entity: this.config.entity_day9 },
       this.config.entity_day10 && { offset: 9, entity: this.config.entity_day10 },
       this.config.entity_day11 && { offset: 10, entity: this.config.entity_day11 },
@@ -331,7 +332,7 @@ class ClockPvForecastCard extends LitElement {
   }
 
 	_getForecastMaxValue() {
-	  if (!this.hass || !this.config) return this.config.max_value || 100;
+	  if (!this.hass || !this.config) return 100;
 
 	  const entities = [
 		this.config.entity_today,
@@ -341,6 +342,7 @@ class ClockPvForecastCard extends LitElement {
 		this.config.entity_day5,
 		this.config.entity_day6,
 		this.config.entity_day7,
+		this.config.entity_day8,
 	  ].filter(Boolean);
 
 	  const values = entities
@@ -414,6 +416,7 @@ class ClockPvForecastCardEditor extends LitElement {
         entity_day5: "Day 5 Entity",
         entity_day6: "Day 6 Entity",
         entity_day7: "Day 7 Entity",
+        entity_day8: "Day 8 Entity",
         
         entity_remaining: "Remaining Energy Entity",
         remaining_indicator: "Indicator Type",
