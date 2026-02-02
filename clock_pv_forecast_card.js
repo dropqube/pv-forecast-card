@@ -330,6 +330,7 @@ class ClockPvForecastCard extends LitElement {
   _getForecastMaxValue() {
     if (!this.hass || !this.config) return 100;
 
+    const configMax = parseFloat(this.config.max_value);
     const entityKeys = ['entity_today', 'entity_tomorrow', ...Array.from({ length: 11 }, (_, i) => `entity_day${i + 3}`)];
     const values = entityKeys
       .map(key => this.config[key])
@@ -337,10 +338,15 @@ class ClockPvForecastCard extends LitElement {
       .map(e => parseFloat(this.hass.states[e]?.state))
       .filter(v => !isNaN(v));
 
-    if (values.length === 0) return 100;
+    const dataMax = values.length > 0 ? Math.max(...values) : 0;
 
-    const rawMax = Math.max(...values);
-    return this._roundUp5(rawMax);
+    if (!isNaN(configMax) && configMax > 0) {
+      return Math.max(configMax, dataMax);
+    }
+
+    if (dataMax > 0) return this._roundUp5(dataMax);
+
+    return 100;
   }
 
   _roundUp5(value) {
