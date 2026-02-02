@@ -542,3 +542,12 @@ class ClockPvForecastCardEditor extends LitElement {
 
 customElements.define('clock-pv-forecast-card-editor', ClockPvForecastCardEditor);
 customElements.define('clock-pv-forecast-card', ClockPvForecastCard);
+if (window.customCards) {
+  window.customCards.push({
+    type: 'clock-pv-forecast-card',
+    name: 'Clock PV Forecast Card',
+    description: 'A solar forecast card displaying PV yield predictions',
+    preview: false,
+    documentationURL: 'https://github.com/dropqube/pv-forecast-card'
+  });
+}
