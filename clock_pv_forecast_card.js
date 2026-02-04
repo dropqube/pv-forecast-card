@@ -73,6 +73,7 @@ class ClockPvForecastCard extends LitElement {
       marker_color: '#2c3e50',
       gradient_fixed: false,
       show_tooltips: false,
+      scale_mode: 'fixed',
       ...config
     };
 
@@ -172,7 +173,8 @@ class ClockPvForecastCard extends LitElement {
       backgroundValue = `linear-gradient(to right, ${this.config.bar_color_start}, ${this.config.bar_color_end})`;
     }
 
-    const barWidthVal = this._barWidth(value, maxValue);
+    const rowMax = this.config.scale_mode === 'daily' ? (value > 0 ? value : 1) : maxValue;
+    const barWidthVal = this._barWidth(value, rowMax);
     const barStyle = `--bar-width: ${barWidthVal}%; --bar-bg: ${backgroundValue}; --animation-time: ${this.config.animation_duration}`;
 
     let remainingDot = '';
@@ -340,6 +342,10 @@ class ClockPvForecastCard extends LitElement {
 
     const dataMax = values.length > 0 ? Math.max(...values) : 0;
 
+    if (this.config.scale_mode === 'auto') {
+      return dataMax > 0 ? this._roundUp5(dataMax) : 100;
+    }
+
     if (!isNaN(configMax) && configMax > 0) {
       return Math.max(configMax, dataMax);
     }
@@ -355,6 +361,7 @@ class ClockPvForecastCard extends LitElement {
   }
 
   _barWidth(val, max) {
+    if (max <= 0) return 0;
     return Math.min((val / max) * 100, 100);
   }
 
@@ -410,7 +417,7 @@ class ClockPvForecastCardEditor extends LitElement {
       remaining_label: "Remaining Label (Optional)",
       remaining_threshold: "Low Threshold (kWh)",
       remaining_blink: "Blink if Low",
-
+      scale_mode: "Scaling Mode",
       max_value: "Max Value (kWh)",
       display_mode: "Display Mode",
       bar_style: "Bar Style",
@@ -494,6 +501,18 @@ class ClockPvForecastCardEditor extends LitElement {
         }
       },
       { name: "animation_duration", selector: { text: {} } },
+      {
+        name: "scale_mode",
+        selector: {
+          select: {
+            mode: "dropdown", options: [
+              { value: "fixed", label: "Fixed (Max Value)" },
+              { value: "auto", label: "Auto-Scale (Data max)" },
+              { value: "daily", label: "Daily (Each bar 100%)" }
+            ]
+          }
+        }
+      },
       { name: "gradient_fixed", selector: { boolean: {} } },
       { name: "show_tooltips", selector: { boolean: {} } },
 

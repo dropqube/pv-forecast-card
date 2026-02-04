@@ -34,7 +34,8 @@ You can configure almost everything via the **Visual Editor**. For advanced setu
 | `entity_tomorrow` | string | Optional | Sensor for tomorrow's forecast. |
 | `entity_day3` to `day13` | string | Optional | Sensors for the following days (up to 14 days total). |
 | `entity_remaining` | string | Optional | Sensor for remaining energy today. |
-| `max_value` | number | `100` | Value (kWh) representing 100% bar width. |
+| `max_value` | number | `100` | Value (kWh) representing 100% bar width (in `fixed` mode). |
+| `scale_mode` | string | `fixed` | `fixed`, `auto` (globally dynamic), or `daily` (per-row 100%). |
 | `display_mode` | string | `weekday` | `weekday`, `date`, or `relative`. |
 | `weekday_format` | string | `short` | `short` (Mon), `long` (Monday), `narrow` (M). |
 | `date_format` | string | `short` | `short` (12. Jun) or `numeric` (12.6.). |
@@ -99,7 +100,8 @@ Die Karte verfügt nun über einen **Visuellen Editor**. Die meisten Einstellung
 | `entity_tomorrow` | string | Optional | Sensor für die morgige Prognose. |
 | `entity_day3` bis `day13` | string | Optional | Sensoren für die Folgetage (bis zu 14 Tage). |
 | `entity_remaining` | string | Optional | Sensor für den verbleibenden Ertrag heute. |
-| `max_value` | Zahl | `100` | Maximalwert für 100% Balkenbreite (kWh). |
+| `max_value` | Zahl | `100` | Maximalwert für 100% Balkenbreite (im `fixed` Modus). |
+| `scale_mode` | string | `fixed` | `fixed`, `auto` (global dynamisch) oder `daily` (pro Zeile 100%). |
 | `display_mode` | string | `weekday` | `weekday` (Mo), `date` (12.6.), `relative` (Heute). |
 | `weekday_format` | string | `short` | `short` (Mo), `long` (Montag), `narrow` (M). |
 | `date_format` | string | `short` | `short` (12. Jun) oder `numeric` (12.6.). |
