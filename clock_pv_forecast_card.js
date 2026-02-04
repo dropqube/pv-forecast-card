@@ -1,11 +1,11 @@
 // clock_pv_forecast_card.js
 
-// V1.8.5 - Fixes
+
 const LitElement = Object.getPrototypeOf(customElements.get("ha-panel-lovelace"));
 const html = LitElement.prototype.html;
 const css = LitElement.prototype.css;
 
-console.info("📦 clock-pv-forecast-card v1.8.5 loaded (Full Editor)");
+console.info("📦 clock-pv-forecast-card v1.9.0 loaded (Full Editor)");
 
 const translations = {
   en: { forecast: "Forecast", remaining: "Remaining", last_updated: "Last updated", today: "Today", tomorrow: "Tomorrow", error_config: "Configuration Error", error_entity: "At least one forecast entity must be defined", unavailable: "Unavailable", unknown: "Unknown" },
@@ -74,6 +74,8 @@ class ClockPvForecastCard extends LitElement {
       gradient_fixed: false,
       show_tooltips: false,
       scale_mode: 'fixed',
+      forecast_attribute: null,
+      attribute_color: '#f39c12',
       ...config
     };
 
@@ -177,6 +179,18 @@ class ClockPvForecastCard extends LitElement {
     const barWidthVal = this._barWidth(value, rowMax);
     const barStyle = `--bar-width: ${barWidthVal}%; --bar-bg: ${backgroundValue}; --animation-time: ${this.config.animation_duration}`;
 
+    let attributeMarker = '';
+    let attributeText = '';
+
+    if (this.config.forecast_attribute && entityState.attributes[this.config.forecast_attribute] !== undefined) {
+      const attrVal = parseFloat(entityState.attributes[this.config.forecast_attribute]);
+      if (!isNaN(attrVal)) {
+        const attrPos = this._barWidth(attrVal, rowMax);
+        attributeMarker = html`<div class="attribute-marker" style="left: ${attrPos}%; --attr-color: ${this.config.attribute_color || '#f39c12'};"></div>`;
+        // Optional: Add to tooltip or text? For now, just marker as requested "visual all the time"
+      }
+    }
+
     let remainingDot = '';
     let remainingText = '';
 
@@ -220,6 +234,7 @@ class ClockPvForecastCard extends LitElement {
         <div class="day" role="cell" style="width: ${this.config.day_column_width}">${dayLabel}</div>
         <div class="bar-container ${this.config.gradient_fixed ? 'fixed-gradient' : ''}" role="cell">
           <div class="bar" style="${barStyle}"></div>
+          ${attributeMarker}
           ${remainingDot}${remainingText}
           ${this.config.show_tooltips ? this._renderTooltip(value, item.entity, dayLabel) : ''}
         </div>
@@ -377,6 +392,7 @@ class ClockPvForecastCard extends LitElement {
     .bar { height: 100%; border-radius: 7px; width: 0%; background: var(--bar-bg); animation: fill-bar var(--animation-time) ease-out forwards; }
     .bar-container.fixed-gradient .bar { background-size: 100cqi; }
     .bar.blink { animation: fill-bar var(--animation-time) ease-out forwards, blink 1s infinite; }
+    .attribute-marker { position: absolute; top: 0; bottom: 0; width: 4px; background: var(--attr-color, #f39c12); opacity: 0.8; z-index: 5; transform: translateX(-50%); box-shadow: 0 0 4px rgba(0,0,0,0.4); border-radius: 2px; }
     .remaining-dot { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 10px; height: 10px; border-radius: 50%; background: var(--marker-color, #2c3e50); border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index: 2; cursor: help; }
     .remaining-text-inside { position: absolute; top: 50%; transform: translateY(-50%); color: white; font-size: 0.7em; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); z-index: 3; pointer-events: none; white-space: nowrap; }
     .value { width: 4.5em; text-align: right; font-size: 0.85em; font-weight: bold; white-space: nowrap; color: var(--secondary-text-color); }
@@ -419,6 +435,8 @@ class ClockPvForecastCardEditor extends LitElement {
       remaining_blink: "Blink if Low",
       scale_mode: "Scaling Mode",
       max_value: "Max Value (kWh)",
+      forecast_attribute: "Info Attribute (e.g. estimate10 for solcast users)",
+      attribute_color: "Attribute Color (Hex)",
       display_mode: "Display Mode",
       bar_style: "Bar Style",
       show_tooltips: "Show Tooltips",
@@ -451,6 +469,8 @@ class ClockPvForecastCardEditor extends LitElement {
 
       // DISPLAY & FORMATS
       { name: "max_value", selector: { number: { mode: "box", min: 1 } } },
+      { name: "forecast_attribute", selector: { text: {} } },
+      { name: "attribute_color", selector: { text: {} } },
       {
         name: "display_mode",
         selector: {
