@@ -5,7 +5,7 @@ const LitElement = Object.getPrototypeOf(customElements.get("ha-panel-lovelace")
 const html = LitElement.prototype.html;
 const css = LitElement.prototype.css;
 
-console.info("📦 clock-pv-forecast-card v1.9.0 loaded (Full Editor)");
+console.info("📦 clock-pv-forecast-card v1.9.1 loaded (Full Editor)");
 
 const translations = {
   en: { forecast: "Forecast", remaining: "Remaining", last_updated: "Last updated", today: "Today", tomorrow: "Tomorrow", error_config: "Configuration Error", error_entity: "At least one forecast entity must be defined", unavailable: "Unavailable", unknown: "Unknown" },
