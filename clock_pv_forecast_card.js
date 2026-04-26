@@ -38,6 +38,7 @@ class ClockPvForecastCard extends LitElement {
     super();
     this._weekdayCache = {};
     this._dateCache = {};
+    this._cacheDate = new Date().toDateString();
     this._configError = null;
   }
 
@@ -119,7 +120,17 @@ class ClockPvForecastCard extends LitElement {
     return false;
   }
 
+  _checkCacheDate() {
+    const today = new Date().toDateString();
+    if (this._cacheDate !== today) {
+      this._weekdayCache = {};
+      this._dateCache = {};
+      this._cacheDate = today;
+    }
+  }
+
   render() {
+    this._checkCacheDate();
     if (this._configError) {
       const errorTitle = this._localize('error_config');
       const errorMsg = this._configError === 'config_missing' ? 'Configuration is required' : this._localize('error_entity');
